@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../core/models/models.dart';
+import '../../shared/utils/responsive.dart';
 
 class CheckOutScreen extends StatefulWidget {
   const CheckOutScreen({super.key});
@@ -25,6 +26,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     final svc = context.watch<MockDataService>();
     final fmt = NumberFormat('#,###', 'vi_VN');
     final dtFmt = DateFormat('HH:mm – dd/MM/yyyy');
+    final isMobile = Responsive.isMobile(context);
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -34,16 +36,25 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           Expanded(
             flex: 3,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(28),
+              padding: EdgeInsets.all(isMobile ? 16 : 28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Xe ra (Check-out)', style: Theme.of(context).textTheme.displayMedium)
-                      .animate().fadeIn(),
+                  Center(
+                    child: Text(
+                      'Xe ra (Check-out)',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .displayMedium
+                          ?.copyWith(fontSize: isMobile ? 22 : null),
+                    ),
+                  ).animate().fadeIn(),
                   const SizedBox(height: 8),
                   const Text('Tìm kiếm lượt gửi theo biển số để xử lý xe ra.',
-                      style: TextStyle(color: AppColors.textSecondary))
-                      .animate().fadeIn(delay: 100.ms),
+                          style: TextStyle(color: AppColors.textSecondary))
+                      .animate()
+                      .fadeIn(delay: 100.ms),
                   const SizedBox(height: 32),
 
                   // Search box
@@ -52,11 +63,15 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       Expanded(
                         child: TextField(
                           controller: _searchCtrl,
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
                           textCapitalization: TextCapitalization.characters,
                           decoration: const InputDecoration(
                             hintText: 'Nhập biển số xe (VD: 51A-12345)',
-                            prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
+                            prefixIcon: Icon(Icons.search,
+                                color: AppColors.textSecondary),
                           ),
                           onSubmitted: (_) => _search(svc),
                         ),
@@ -68,7 +83,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           onPressed: () => _search(svc),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text('Tìm kiếm'),
                         ),
@@ -84,7 +100,18 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                         color: Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                      child: Text(_error!,
+                          style:
+                              const TextStyle(color: Colors.red, fontSize: 13)),
+                    ),
+                  ],
+
+                  if (isMobile && _completed != null) ...[
+                    const SizedBox(height: 20),
+                    _CheckOutResult(
+                      session: _completed!,
+                      fmt: fmt,
+                      dtFmt: dtFmt,
                     ),
                   ],
 
@@ -98,12 +125,18 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _loading ? null : () => _doCheckOut(svc),
                         icon: _loading
-                            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                    color: Colors.white, strokeWidth: 2))
                             : const Icon(Icons.logout),
-                        label: const Text('Xác nhận thanh toán & Xe ra', style: TextStyle(fontSize: 16)),
+                        label: const Text('Xác nhận thanh toán & Xe ra',
+                            style: TextStyle(fontSize: 16)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.occupied,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
                     ),
@@ -111,43 +144,51 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
 
                   // Active sessions list
                   const SizedBox(height: 32),
-                  _ActiveSessionsList(svc: svc, onSelect: (s) {
-                    setState(() {
-                      _found = s;
-                      _completed = null;
-                      _error = null;
-                      _searchCtrl.text = s.licensePlate;
-                    });
-                  }),
+                  _ActiveSessionsList(
+                      svc: svc,
+                      onSelect: (s) {
+                        setState(() {
+                          _found = s;
+                          _completed = null;
+                          _error = null;
+                          _searchCtrl.text = s.licensePlate;
+                        });
+                      }),
                 ],
               ),
             ),
           ),
 
           // Result panel
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: const BoxDecoration(
-                border: Border(left: BorderSide(color: AppColors.border)),
+          if (!isMobile)
+            Expanded(
+              flex: 2,
+              child: Container(
+                decoration: const BoxDecoration(
+                  border: Border(left: BorderSide(color: AppColors.border)),
+                ),
+                child: _completed == null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.receipt_long,
+                                color: AppColors.textMuted, size: 48),
+                            SizedBox(height: 16),
+                            Text('Chưa có xe ra',
+                                style:
+                                    TextStyle(color: AppColors.textSecondary)),
+                            SizedBox(height: 8),
+                            Text('Tìm kiếm và xử lý xe ra bên trái.',
+                                style: TextStyle(
+                                    color: AppColors.textMuted, fontSize: 12)),
+                          ],
+                        ),
+                      )
+                    : _CheckOutResult(
+                        session: _completed!, fmt: fmt, dtFmt: dtFmt),
               ),
-              child: _completed == null
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.receipt_long, color: AppColors.textMuted, size: 48),
-                          SizedBox(height: 16),
-                          Text('Chưa có xe ra', style: TextStyle(color: AppColors.textSecondary)),
-                          SizedBox(height: 8),
-                          Text('Tìm kiếm và xử lý xe ra bên trái.',
-                              style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
-                        ],
-                      ),
-                    )
-                  : _CheckOutResult(session: _completed!, fmt: fmt, dtFmt: dtFmt),
             ),
-          ),
         ],
       ),
     );
@@ -163,7 +204,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     setState(() {
       _found = session;
       _completed = null;
-      _error = session == null ? 'Không tìm thấy xe đang gửi với biển số "$plate".' : null;
+      _error = session == null
+          ? 'Không tìm thấy xe đang gửi với biển số "$plate".'
+          : null;
     });
   }
 
@@ -187,12 +230,14 @@ class _SessionFoundCard extends StatelessWidget {
   final ParkingSession session;
   final NumberFormat fmt;
   final DateFormat dtFmt;
-  const _SessionFoundCard({required this.session, required this.fmt, required this.dtFmt});
+  const _SessionFoundCard(
+      {required this.session, required this.fmt, required this.dtFmt});
 
   @override
   Widget build(BuildContext context) {
     final dur = DateTime.now().difference(session.entryTime);
-    final rate = context.read<MockDataService>().getPriceForType(session.vehicleType);
+    final rate =
+        context.read<MockDataService>().getPriceForType(session.vehicleType);
     final estimatedFee = session.calculateFee(rate);
 
     return Container(
@@ -207,14 +252,21 @@ class _SessionFoundCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(session.vehicleType.icon, style: const TextStyle(fontSize: 28)),
+              Text(session.vehicleType.icon,
+                  style: const TextStyle(fontSize: 28)),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(session.licensePlate,
-                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                  Text(session.vehicleType.label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                      style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1)),
+                  Text(session.vehicleType.label,
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 13)),
                 ],
               ),
             ],
@@ -227,10 +279,15 @@ class _SessionFoundCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Phí ước tính:', style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+              const Text('Phí ước tính:',
+                  style:
+                      TextStyle(color: AppColors.textSecondary, fontSize: 14)),
               Text(
                 '${fmt.format(estimatedFee)}đ',
-                style: const TextStyle(color: AppColors.reserved, fontSize: 22, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: AppColors.reserved,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -252,8 +309,14 @@ class _Row2 extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-          Text(value, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 13)),
+          Text(label,
+              style: const TextStyle(
+                  color: AppColors.textSecondary, fontSize: 13)),
+          Text(value,
+              style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13)),
         ],
       ),
     );
@@ -264,7 +327,8 @@ class _CheckOutResult extends StatelessWidget {
   final ParkingSession session;
   final NumberFormat fmt;
   final DateFormat dtFmt;
-  const _CheckOutResult({required this.session, required this.fmt, required this.dtFmt});
+  const _CheckOutResult(
+      {required this.session, required this.fmt, required this.dtFmt});
 
   @override
   Widget build(BuildContext context) {
@@ -275,7 +339,10 @@ class _CheckOutResult extends StatelessWidget {
           const Icon(Icons.check_circle, color: AppColors.available, size: 60),
           const SizedBox(height: 12),
           Text('Xe ra thành công!',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColors.available)),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: AppColors.available)),
           const SizedBox(height: 24),
           Container(
             width: double.infinity,
@@ -288,7 +355,8 @@ class _CheckOutResult extends StatelessWidget {
             child: Column(
               children: [
                 _Row2('Biển số', session.licensePlate),
-                _Row2('Loại xe', '${session.vehicleType.icon} ${session.vehicleType.label}'),
+                _Row2('Loại xe',
+                    '${session.vehicleType.icon} ${session.vehicleType.label}'),
                 _Row2('Slot', session.slotCode),
                 _Row2('Giờ vào', dtFmt.format(session.entryTime)),
                 _Row2('Giờ ra', dtFmt.format(session.exitTime!)),
@@ -298,16 +366,24 @@ class _CheckOutResult extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Tổng phí:', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
+                    const Text('Tổng phí:',
+                        style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600)),
                     Text(
                       '${fmt.format(session.totalFee ?? 0)}đ',
-                      style: const TextStyle(color: AppColors.available, fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          color: AppColors.available,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.available.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -317,7 +393,9 @@ class _CheckOutResult extends StatelessWidget {
                     children: [
                       Icon(Icons.check, color: AppColors.available, size: 14),
                       SizedBox(width: 6),
-                      Text('Đã thanh toán', style: TextStyle(color: AppColors.available, fontSize: 12)),
+                      Text('Đã thanh toán',
+                          style: TextStyle(
+                              color: AppColors.available, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -353,15 +431,22 @@ class _ActiveSessionsList extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               side: const BorderSide(color: AppColors.border),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            leading: Text(s.vehicleType.icon, style: const TextStyle(fontSize: 22)),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            leading:
+                Text(s.vehicleType.icon, style: const TextStyle(fontSize: 22)),
             title: Text(s.licensePlate,
-                style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
-            subtitle: Text('Slot ${s.slotCode}  •  ${dur.inHours}g${dur.inMinutes % 60}m',
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
-            trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                style: const TextStyle(
+                    color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+            subtitle: Text(
+                'Slot ${s.slotCode}  •  ${dur.inHours}g${dur.inMinutes % 60}m',
+                style:
+                    const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+            trailing:
+                const Icon(Icons.chevron_right, color: AppColors.textMuted),
           );
-        }).map((e) => Padding(padding: const EdgeInsets.only(bottom: 8), child: e)),
+        }).map((e) =>
+            Padding(padding: const EdgeInsets.only(bottom: 8), child: e)),
       ],
     );
   }

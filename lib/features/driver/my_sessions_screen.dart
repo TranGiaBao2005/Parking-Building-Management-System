@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../core/models/models.dart';
+import '../../shared/utils/responsive.dart';
 
 class MySessionsScreen extends StatefulWidget {
   const MySessionsScreen({super.key});
@@ -38,23 +39,33 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
     final user = svc.currentUser;
     final fmt = NumberFormat('#,###', 'vi_VN');
     final dtFmt = DateFormat('HH:mm – dd/MM/yyyy');
+    final isMobile = Responsive.isMobile(context);
 
-    final activeSessions = user != null ? svc.activeSessionsForUser(user.id) : [];
+    final activeSessions =
+        user != null ? svc.activeSessionsForUser(user.id) : [];
     final allCompleted = svc.completedSessions.take(10).toList();
 
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(28),
+        padding: EdgeInsets.all(isMobile ? 16 : 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Lượt gửi xe của tôi', style: Theme.of(context).textTheme.displayMedium)
-                .animate().fadeIn(),
+            Center(
+              child: Text(
+                'Lượt gửi xe của tôi',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      fontSize: isMobile ? 22 : null,
+                    ),
+              ),
+            ).animate().fadeIn(),
             const SizedBox(height: 8),
             const Text('Xem giờ vào và phí tạm tính theo thời gian thực.',
-                style: TextStyle(color: AppColors.textSecondary))
-                .animate().fadeIn(delay: 100.ms),
+                    style: TextStyle(color: AppColors.textSecondary))
+                .animate()
+                .fadeIn(delay: 100.ms),
             const SizedBox(height: 28),
 
             // Active sessions
@@ -70,25 +81,29 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text('Đang gửi xe', style: Theme.of(context).textTheme.titleLarge),
+                  Text('Đang gửi xe',
+                      style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(width: 8),
                   const Text('(phí cập nhật mỗi phút)',
-                      style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                      style:
+                          TextStyle(color: AppColors.textMuted, fontSize: 11)),
                 ],
               ),
               const SizedBox(height: 14),
               ...activeSessions.map((s) => _ActiveSessionCard(
-                session: s,
-                fmt: fmt,
-                dtFmt: dtFmt,
-                svc: svc,
-              ).animate().fadeIn()),
+                    session: s,
+                    fmt: fmt,
+                    dtFmt: dtFmt,
+                    svc: svc,
+                  ).animate().fadeIn()),
               const SizedBox(height: 28),
             ],
 
             // History
-            Text('Lịch sử gửi xe', style: Theme.of(context).textTheme.titleLarge)
-                .animate().fadeIn(delay: 200.ms),
+            Text('Lịch sử gửi xe',
+                    style: Theme.of(context).textTheme.titleLarge)
+                .animate()
+                .fadeIn(delay: 200.ms),
             const SizedBox(height: 14),
             if (allCompleted.isEmpty)
               const Center(
@@ -100,10 +115,12 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
               )
             else
               ...allCompleted.asMap().entries.map((e) => _HistorySessionCard(
-                session: e.value,
-                fmt: fmt,
-                dtFmt: dtFmt,
-              ).animate().fadeIn(delay: Duration(milliseconds: 200 + e.key * 50))),
+                    session: e.value,
+                    fmt: fmt,
+                    dtFmt: dtFmt,
+                  )
+                      .animate()
+                      .fadeIn(delay: Duration(milliseconds: 200 + e.key * 50))),
           ],
         ),
       ),
@@ -142,13 +159,15 @@ class _ActiveSessionCard extends StatelessWidget {
           ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.available.withOpacity(0.4), width: 2),
+        border:
+            Border.all(color: AppColors.available.withOpacity(0.4), width: 2),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Text(session.vehicleType.icon, style: const TextStyle(fontSize: 32)),
+              Text(session.vehicleType.icon,
+                  style: const TextStyle(fontSize: 32)),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -160,19 +179,25 @@ class _ActiveSessionCard extends StatelessWidget {
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1)),
-                    Text('${session.vehicleType.label}  •  Slot ${session.slotCode}',
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                    Text(
+                        '${session.vehicleType.label}  •  Slot ${session.slotCode}',
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 13)),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: AppColors.available.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text('Đang gửi',
-                    style: TextStyle(color: AppColors.available, fontSize: 11, fontWeight: FontWeight.w600)),
+                    style: TextStyle(
+                        color: AppColors.available,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -180,25 +205,31 @@ class _ActiveSessionCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _TimeMetric(
-                icon: Icons.login,
-                label: 'Giờ vào',
-                value: DateFormat('HH:mm').format(session.entryTime),
-                color: AppColors.primary,
+              Expanded(
+                child: _TimeMetric(
+                  icon: Icons.login,
+                  label: 'Giờ vào',
+                  value: DateFormat('HH:mm').format(session.entryTime),
+                  color: AppColors.primary,
+                ),
               ),
               Container(width: 1, height: 40, color: AppColors.border),
-              _TimeMetric(
-                icon: Icons.timer,
-                label: 'Thời gian',
-                value: '${dur.inHours}g ${dur.inMinutes % 60}m',
-                color: AppColors.accent,
+              Expanded(
+                child: _TimeMetric(
+                  icon: Icons.timer,
+                  label: 'Thời gian',
+                  value: '${dur.inHours}g ${dur.inMinutes % 60}m',
+                  color: AppColors.accent,
+                ),
               ),
               Container(width: 1, height: 40, color: AppColors.border),
-              _TimeMetric(
-                icon: Icons.attach_money,
-                label: 'Phí tạm tính',
-                value: '${fmt.format(fee)}đ',
-                color: AppColors.reserved,
+              Expanded(
+                child: _TimeMetric(
+                  icon: Icons.attach_money,
+                  label: 'Phí tạm tính',
+                  value: '${fmt.format(fee)}đ',
+                  color: AppColors.reserved,
+                ),
               ),
             ],
           ),
@@ -213,7 +244,11 @@ class _TimeMetric extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _TimeMetric({required this.icon, required this.label, required this.value, required this.color});
+  const _TimeMetric(
+      {required this.icon,
+      required this.label,
+      required this.value,
+      required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -221,8 +256,14 @@ class _TimeMetric extends StatelessWidget {
       children: [
         Icon(icon, color: color, size: 18),
         const SizedBox(height: 4),
-        Text(value, style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(value,
+              style: TextStyle(
+                  color: color, fontSize: 16, fontWeight: FontWeight.bold)),
+        ),
+        Text(label,
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
       ],
     );
   }
@@ -232,7 +273,8 @@ class _HistorySessionCard extends StatelessWidget {
   final ParkingSession session;
   final NumberFormat fmt;
   final DateFormat dtFmt;
-  const _HistorySessionCard({required this.session, required this.fmt, required this.dtFmt});
+  const _HistorySessionCard(
+      {required this.session, required this.fmt, required this.dtFmt});
 
   @override
   Widget build(BuildContext context) {
@@ -257,20 +299,29 @@ class _HistorySessionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(session.licensePlate,
-                    style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 14)),
+                    style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14)),
                 Text(
                   '${dtFmt.format(session.entryTime)}  →  ${session.exitTime != null ? DateFormat("HH:mm").format(session.exitTime!) : "?"}',
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                  style:
+                      const TextStyle(color: AppColors.textMuted, fontSize: 11),
                 ),
-                Text('${dur.inHours}g${dur.inMinutes % 60}m  •  Slot ${session.slotCode}',
-                    style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                Text(
+                    '${dur.inHours}g${dur.inMinutes % 60}m  •  Slot ${session.slotCode}',
+                    style: const TextStyle(
+                        color: AppColors.textMuted, fontSize: 11)),
               ],
             ),
           ),
           if (session.totalFee != null)
             Text(
               '${fmt.format(session.totalFee!)}đ',
-              style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 14),
+              style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14),
             ),
         ],
       ),

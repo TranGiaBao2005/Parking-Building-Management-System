@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../core/models/models.dart';
 import 'widgets/ai_optimization_dialog.dart';
+import '../../shared/utils/responsive.dart';
 
 class SlotManagementScreen extends StatefulWidget {
   const SlotManagementScreen({super.key});
@@ -20,28 +21,57 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
   @override
   Widget build(BuildContext context) {
     final svc = context.watch<MockDataService>();
+    final isMobile = Responsive.isMobile(context);
 
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Padding(
-        padding: const EdgeInsets.all(28),
+        padding: EdgeInsets.all(isMobile ? 16 : 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Quản lý Slot', style: Theme.of(context).textTheme.displayMedium),
-                Row(
-                  children: [
-                    _buildAiButton(context, svc),
-                    const SizedBox(width: 20),
-                    _buildLegend(),
-                  ],
+            if (isMobile) ...[
+              Center(
+                child: Text(
+                  'Quản lý Slot',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context)
+                      .textTheme
+                      .displayMedium
+                      ?.copyWith(fontSize: 22),
                 ),
-              ],
-            ).animate().fadeIn(),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(child: _buildAiButton(context, svc)),
+                  const SizedBox(width: 10),
+                  _buildAvailableBadge(svc),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: _buildLegend(),
+              ),
+            ] else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Quản lý Slot',
+                      style: Theme.of(context).textTheme.displayMedium),
+                  Row(
+                    children: [
+                      _buildAiButton(context, svc),
+                      const SizedBox(width: 12),
+                      _buildAvailableBadge(svc),
+                      const SizedBox(width: 20),
+                      _buildLegend(),
+                    ],
+                  ),
+                ],
+              ).animate().fadeIn(),
             const SizedBox(height: 20),
 
             // Floor tabs
@@ -92,7 +122,9 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
         elevation: 4,
         shadowColor: AppColors.primary.withOpacity(0.5),
       ),
-    ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, color: Colors.white.withOpacity(0.3));
+    )
+        .animate(onPlay: (c) => c.repeat(reverse: true))
+        .shimmer(duration: 2.seconds, color: Colors.white.withOpacity(0.3));
   }
 
   Widget _buildLegend() {
@@ -104,23 +136,53 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
       (AppColors.locked, 'Tạm khóa'),
     ];
     return Row(
-      children: items.map((item) => Padding(
-        padding: const EdgeInsets.only(left: 16),
-        child: Row(
-          children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                color: item.$1,
-                borderRadius: BorderRadius.circular(3),
-              ),
+      children: items
+          .map((item) => Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: item.$1,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(item.$2,
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 12)),
+                  ],
+                ),
+              ))
+          .toList(),
+    );
+  }
+
+  Widget _buildAvailableBadge(MockDataService svc) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+      decoration: BoxDecoration(
+        color: AppColors.available.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.available.withOpacity(0.35)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '${svc.totalAvailable()}',
+            style: const TextStyle(
+              color: AppColors.available,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(width: 5),
-            Text(item.$2, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-          ],
-        ),
-      )).toList(),
+          ),
+          const Text('Ô trống',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 10)),
+        ],
+      ),
     );
   }
 }
@@ -140,47 +202,56 @@ class _FloorTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: floors.map((floor) {
-        final isSelected = floor.id == selectedId;
-        final avail = svc.availableCount(floor.id);
-        final occ = svc.occupiedCount(floor.id);
-        final total = svc.slotsForFloor(floor.id).length;
-        return GestureDetector(
-          onTap: () => onSelect(floor.id),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            margin: const EdgeInsets.only(right: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary.withOpacity(0.15) : AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected ? AppColors.primary : AppColors.border,
-                width: isSelected ? 2 : 1,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: floors.map((floor) {
+          final isSelected = floor.id == selectedId;
+          final avail = svc.availableCount(floor.id);
+          final occ = svc.occupiedCount(floor.id);
+          final total = svc.slotsForFloor(floor.id).length;
+          return GestureDetector(
+            onTap: () => onSelect(floor.id),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary.withOpacity(0.15)
+                    : AppColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? AppColors.primary : AppColors.border,
+                  width: isSelected ? 2 : 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    floor.name,
+                    style: TextStyle(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textPrimary,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Trống: $avail | Dùng: $occ | Tổng: $total',
+                    style: const TextStyle(
+                        color: AppColors.textMuted, fontSize: 11),
+                  ),
+                ],
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  floor.name,
-                  style: TextStyle(
-                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Trống: $avail | Dùng: $occ | Tổng: $total',
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }
@@ -202,25 +273,28 @@ class _FilterRow extends StatelessWidget {
       (SlotStatus.locked, 'Tạm khóa', AppColors.locked),
     ];
 
-    return Row(
-      children: filters.map((f) {
-        final isActive = selected == f.$1;
-        return Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: FilterChip(
-            label: Text(f.$2),
-            selected: isActive,
-            onSelected: (_) => onSelect(isActive ? null : f.$1),
-            selectedColor: f.$3.withOpacity(0.2),
-            checkmarkColor: f.$3,
-            labelStyle: TextStyle(
-              color: isActive ? f.$3 : AppColors.textSecondary,
-              fontSize: 12,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: filters.map((f) {
+          final isActive = selected == f.$1;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterChip(
+              label: Text(f.$2),
+              selected: isActive,
+              onSelected: (_) => onSelect(isActive ? null : f.$1),
+              selectedColor: f.$3.withOpacity(0.2),
+              checkmarkColor: f.$3,
+              labelStyle: TextStyle(
+                color: isActive ? f.$3 : AppColors.textSecondary,
+                fontSize: 12,
+              ),
+              side: BorderSide(color: isActive ? f.$3 : AppColors.border),
             ),
-            side: BorderSide(color: isActive ? f.$3 : AppColors.border),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }
@@ -245,7 +319,8 @@ class _SlotGrid extends StatelessWidget {
 
     if (slotList.isEmpty) {
       return const Center(
-        child: Text('Không có slot nào.', style: TextStyle(color: AppColors.textMuted)),
+        child: Text('Không có slot nào.',
+            style: TextStyle(color: AppColors.textMuted)),
       );
     }
 
@@ -267,7 +342,8 @@ class _SlotGrid extends StatelessWidget {
     );
   }
 
-  void _showSlotDialog(BuildContext context, MockDataService svc, ParkingSlot slot) {
+  void _showSlotDialog(
+      BuildContext context, MockDataService svc, ParkingSlot slot) {
     showDialog(
       context: context,
       builder: (ctx) => _SlotDetailDialog(slot: slot, svc: svc),
@@ -382,7 +458,9 @@ class _SlotDetailDialogState extends State<_SlotDetailDialog> {
               _InfoRow('Biển số', widget.slot.currentLicensePlate!),
             if (canChange) ...[
               const SizedBox(height: 16),
-              const Text('Đổi trạng thái:', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              const Text('Đổi trạng thái:',
+                  style:
+                      TextStyle(color: AppColors.textSecondary, fontSize: 13)),
               const SizedBox(height: 8),
               DropdownButtonFormField<SlotStatus>(
                 value: _newStatus,
@@ -392,10 +470,12 @@ class _SlotDetailDialogState extends State<_SlotDetailDialog> {
                   SlotStatus.available,
                   SlotStatus.maintenance,
                   SlotStatus.locked,
-                ].map((s) => DropdownMenuItem(
-                      value: s,
-                      child: Text(s.label),
-                    )).toList(),
+                ]
+                    .map((s) => DropdownMenuItem(
+                          value: s,
+                          child: Text(s.label),
+                        ))
+                    .toList(),
                 onChanged: (v) => setState(() => _newStatus = v!),
                 decoration: const InputDecoration(isDense: true),
               ),
@@ -414,7 +494,8 @@ class _SlotDetailDialogState extends State<_SlotDetailDialog> {
               widget.svc.updateSlotStatus(widget.slot.id, _newStatus);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Đã cập nhật slot ${widget.slot.slotCode}')),
+                SnackBar(
+                    content: Text('Đã cập nhật slot ${widget.slot.slotCode}')),
               );
             },
             child: const Text('Cập nhật'),
@@ -436,8 +517,14 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-          Text(value, style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500)),
+          Text(label,
+              style: const TextStyle(
+                  color: AppColors.textSecondary, fontSize: 13)),
+          Text(value,
+              style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500)),
         ],
       ),
     );

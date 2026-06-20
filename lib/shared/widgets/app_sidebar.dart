@@ -24,6 +24,8 @@ class AppSidebar extends StatelessWidget {
   final String currentPath;
   final String title;
   final Color accentColor;
+  final double width;
+  final bool closeOnNavigate;
 
   const AppSidebar({
     super.key,
@@ -31,7 +33,17 @@ class AppSidebar extends StatelessWidget {
     required this.currentPath,
     required this.title,
     this.accentColor = AppColors.primary,
+    this.width = 240,
+    this.closeOnNavigate = false,
   });
+
+  void _navigate(BuildContext context, String path) {
+    final router = GoRouter.of(context);
+    if (closeOnNavigate) {
+      Navigator.of(context).pop();
+    }
+    router.go(path);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +51,7 @@ class AppSidebar extends StatelessWidget {
     final user = svc.currentUser;
 
     return Container(
-      width: 240,
+      width: width,
       decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(right: BorderSide(color: AppColors.border, width: 1)),
@@ -74,7 +86,8 @@ class AppSidebar extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.local_parking, color: Colors.white, size: 20),
+                      child: const Icon(Icons.local_parking,
+                          color: Colors.white, size: 20),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -109,7 +122,10 @@ class AppSidebar extends StatelessWidget {
               child: Column(
                 children: items.map((item) {
                   bool isActive;
-                  if (item.path == '/manager' || item.path == '/staff' || item.path == '/admin' || item.path == '/driver') {
+                  if (item.path == '/manager' ||
+                      item.path == '/staff' ||
+                      item.path == '/admin' ||
+                      item.path == '/driver') {
                     isActive = currentPath == item.path;
                   } else {
                     isActive = currentPath.startsWith(item.path);
@@ -118,7 +134,7 @@ class AppSidebar extends StatelessWidget {
                     item: item,
                     isActive: isActive,
                     accentColor: accentColor,
-                    onTap: () => context.go(item.path),
+                    onTap: () => _navigate(context, item.path),
                   );
                 }).toList(),
               ),
@@ -178,11 +194,16 @@ class AppSidebar extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.logout, color: AppColors.textMuted, size: 18),
+                    icon: const Icon(Icons.logout,
+                        color: AppColors.textMuted, size: 18),
                     tooltip: 'Đăng xuất',
                     onPressed: () {
+                      final router = GoRouter.of(context);
                       svc.logout();
-                      context.go('/login');
+                      if (closeOnNavigate) {
+                        Navigator.of(context).pop();
+                      }
+                      router.go('/login');
                     },
                   ),
                 ],

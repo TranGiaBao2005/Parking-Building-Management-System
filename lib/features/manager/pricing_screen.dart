@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../core/models/models.dart';
+import '../../shared/utils/responsive.dart';
 
 class PricingScreen extends StatefulWidget {
   const PricingScreen({super.key});
@@ -20,30 +21,40 @@ class _PricingScreenState extends State<PricingScreen> {
   Widget build(BuildContext context) {
     final svc = context.watch<MockDataService>();
     final fmt = NumberFormat('#,###', 'vi_VN');
+    final isMobile = Responsive.isMobile(context);
 
     return Scaffold(
       backgroundColor: AppColors.bg,
-      body: Padding(
-        padding: const EdgeInsets.all(28),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(isMobile ? 16 : 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Chính sách giá', style: Theme.of(context).textTheme.displayMedium)
-                .animate().fadeIn(),
+            Center(
+              child: Text(
+                'Chính sách giá',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      fontSize: isMobile ? 22 : null,
+                    ),
+              ),
+            ).animate().fadeIn(),
             const SizedBox(height: 8),
             const Text('Quản lý bảng giá và quy định tính phí gửi xe.',
-                style: TextStyle(color: AppColors.textSecondary))
-                .animate().fadeIn(delay: 100.ms),
+                    style: TextStyle(color: AppColors.textSecondary))
+                .animate()
+                .fadeIn(delay: 100.ms),
             const SizedBox(height: 32),
 
             // Pricing cards
             Wrap(
+              alignment: WrapAlignment.center,
               spacing: 20,
               runSpacing: 20,
               children: svc.pricingPolicies.asMap().entries.map((e) {
                 final policy = e.value;
                 return SizedBox(
-                  width: 300,
+                  width: isMobile ? MediaQuery.sizeOf(context).width - 32 : 300,
                   child: _editingId == policy.id
                       ? _PricingEditCard(
                           policy: policy,
@@ -59,7 +70,9 @@ class _PricingScreenState extends State<PricingScreen> {
                           fmt: fmt,
                           onEdit: () => setState(() => _editingId = policy.id),
                         ),
-                ).animate().fadeIn(delay: Duration(milliseconds: 100 + e.key * 100));
+                )
+                    .animate()
+                    .fadeIn(delay: Duration(milliseconds: 100 + e.key * 100));
               }).toList(),
             ),
 
@@ -78,17 +91,28 @@ class _PricingScreenState extends State<PricingScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.info_outline, color: AppColors.primaryLight, size: 18),
+                      const Icon(Icons.info_outline,
+                          color: AppColors.primaryLight, size: 18),
                       const SizedBox(width: 8),
-                      Text('Cách tính phí', style: Theme.of(context).textTheme.titleMedium),
+                      Text('Cách tính phí',
+                          style: Theme.of(context).textTheme.titleMedium),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const _RuleRow(icon: Icons.timer, text: 'Phí theo giờ: Tính theo từng giờ (làm tròn lên). Ví dụ: gửi 1.5 giờ → tính 2 giờ.'),
+                  const _RuleRow(
+                      icon: Icons.timer,
+                      text:
+                          'Phí theo giờ: Tính theo từng giờ (làm tròn lên). Ví dụ: gửi 1.5 giờ → tính 2 giờ.'),
                   const SizedBox(height: 10),
-                  const _RuleRow(icon: Icons.nightlight_round, text: 'Phí qua đêm: Áp dụng khi xe gửi qua 22:00 đến 06:00 hôm sau.'),
+                  const _RuleRow(
+                      icon: Icons.nightlight_round,
+                      text:
+                          'Phí qua đêm: Áp dụng khi xe gửi qua 22:00 đến 06:00 hôm sau.'),
                   const SizedBox(height: 10),
-                  const _RuleRow(icon: Icons.calendar_month, text: 'Phí tháng: Đăng ký theo tháng, không giới hạn lượt ra vào trong tháng.'),
+                  const _RuleRow(
+                      icon: Icons.calendar_month,
+                      text:
+                          'Phí tháng: Đăng ký theo tháng, không giới hạn lượt ra vào trong tháng.'),
                 ],
               ),
             ).animate().fadeIn(delay: 400.ms),
@@ -103,7 +127,8 @@ class _PricingDisplayCard extends StatelessWidget {
   final PricingPolicy policy;
   final NumberFormat fmt;
   final VoidCallback onEdit;
-  const _PricingDisplayCard({required this.policy, required this.fmt, required this.onEdit});
+  const _PricingDisplayCard(
+      {required this.policy, required this.fmt, required this.onEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +154,8 @@ class _PricingDisplayCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(policy.vehicleType.icon, style: const TextStyle(fontSize: 24)),
+                  Text(policy.vehicleType.icon,
+                      style: const TextStyle(fontSize: 24)),
                   const SizedBox(width: 10),
                   Text(
                     policy.vehicleType.label,
@@ -142,7 +168,8 @@ class _PricingDisplayCard extends StatelessWidget {
                 ],
               ),
               IconButton(
-                icon: const Icon(Icons.edit_outlined, color: AppColors.textSecondary, size: 18),
+                icon: const Icon(Icons.edit_outlined,
+                    color: AppColors.textSecondary, size: 18),
                 onPressed: onEdit,
                 tooltip: 'Chỉnh sửa',
               ),
@@ -150,16 +177,27 @@ class _PricingDisplayCard extends StatelessWidget {
           ),
           if (policy.description != null) ...[
             const SizedBox(height: 6),
-            Text(policy.description!, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+            Text(policy.description!,
+                style:
+                    const TextStyle(color: AppColors.textMuted, fontSize: 12)),
           ],
           const Divider(color: AppColors.border, height: 24),
-          _PriceRow(label: 'Giá/giờ', value: '${fmt.format(policy.ratePerHour)}đ', color: color),
+          _PriceRow(
+              label: 'Giá/giờ',
+              value: '${fmt.format(policy.ratePerHour)}đ',
+              color: color),
           const SizedBox(height: 10),
           if (policy.overnightRate != null)
-            _PriceRow(label: 'Phí qua đêm', value: '${fmt.format(policy.overnightRate!)}đ', color: AppColors.textPrimary),
+            _PriceRow(
+                label: 'Phí qua đêm',
+                value: '${fmt.format(policy.overnightRate!)}đ',
+                color: AppColors.textPrimary),
           if (policy.overnightRate != null) const SizedBox(height: 10),
           if (policy.monthlyRate != null)
-            _PriceRow(label: 'Phí tháng', value: '${fmt.format(policy.monthlyRate!)}đ', color: AppColors.textPrimary),
+            _PriceRow(
+                label: 'Phí tháng',
+                value: '${fmt.format(policy.monthlyRate!)}đ',
+                color: AppColors.textPrimary),
         ],
       ),
     );
@@ -170,15 +208,20 @@ class _PriceRow extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _PriceRow({required this.label, required this.value, required this.color});
+  const _PriceRow(
+      {required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-        Text(value, style: TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.w600)),
+        Text(label,
+            style:
+                const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+        Text(value,
+            style: TextStyle(
+                color: color, fontSize: 15, fontWeight: FontWeight.w600)),
       ],
     );
   }
@@ -208,9 +251,12 @@ class _PricingEditCardState extends State<_PricingEditCard> {
   @override
   void initState() {
     super.initState();
-    _rate = TextEditingController(text: widget.policy.ratePerHour.toStringAsFixed(0));
-    _overnight = TextEditingController(text: widget.policy.overnightRate?.toStringAsFixed(0) ?? '');
-    _monthly = TextEditingController(text: widget.policy.monthlyRate?.toStringAsFixed(0) ?? '');
+    _rate = TextEditingController(
+        text: widget.policy.ratePerHour.toStringAsFixed(0));
+    _overnight = TextEditingController(
+        text: widget.policy.overnightRate?.toStringAsFixed(0) ?? '');
+    _monthly = TextEditingController(
+        text: widget.policy.monthlyRate?.toStringAsFixed(0) ?? '');
   }
 
   @override
@@ -227,10 +273,13 @@ class _PricingEditCardState extends State<_PricingEditCard> {
         children: [
           Row(
             children: [
-              Text(widget.policy.vehicleType.icon, style: const TextStyle(fontSize: 20)),
+              Text(widget.policy.vehicleType.icon,
+                  style: const TextStyle(fontSize: 20)),
               const SizedBox(width: 8),
               Text('Chỉnh sửa: ${widget.policy.vehicleType.label}',
-                  style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                  style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 16),
@@ -238,21 +287,24 @@ class _PricingEditCardState extends State<_PricingEditCard> {
             controller: _rate,
             keyboardType: TextInputType.number,
             style: const TextStyle(color: AppColors.textPrimary),
-            decoration: const InputDecoration(labelText: 'Giá/giờ (VND)', isDense: true),
+            decoration: const InputDecoration(
+                labelText: 'Giá/giờ (VND)', isDense: true),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _overnight,
             keyboardType: TextInputType.number,
             style: const TextStyle(color: AppColors.textPrimary),
-            decoration: const InputDecoration(labelText: 'Phí qua đêm (VND)', isDense: true),
+            decoration: const InputDecoration(
+                labelText: 'Phí qua đêm (VND)', isDense: true),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _monthly,
             keyboardType: TextInputType.number,
             style: const TextStyle(color: AppColors.textPrimary),
-            decoration: const InputDecoration(labelText: 'Phí tháng (VND)', isDense: true),
+            decoration: const InputDecoration(
+                labelText: 'Phí tháng (VND)', isDense: true),
           ),
           const SizedBox(height: 16),
           Row(
@@ -267,7 +319,8 @@ class _PricingEditCardState extends State<_PricingEditCard> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    final rate = double.tryParse(_rate.text) ?? widget.policy.ratePerHour;
+                    final rate = double.tryParse(_rate.text) ??
+                        widget.policy.ratePerHour;
                     final overnight = double.tryParse(_overnight.text);
                     final monthly = double.tryParse(_monthly.text);
                     widget.onSave(rate, overnight, monthly);
@@ -296,7 +349,9 @@ class _RuleRow extends StatelessWidget {
         Icon(icon, color: AppColors.primaryLight, size: 16),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(text, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+          child: Text(text,
+              style: const TextStyle(
+                  color: AppColors.textSecondary, fontSize: 13)),
         ),
       ],
     );

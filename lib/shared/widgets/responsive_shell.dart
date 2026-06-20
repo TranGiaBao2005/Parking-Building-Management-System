@@ -105,7 +105,8 @@ class _MobileLayout extends StatelessWidget {
       // Exact match always wins
       if (currentPath == item.path) return i;
       // Prefix match – pick the longest prefix
-      if (currentPath.startsWith(item.path) && item.path.length > bestMatchLen) {
+      if (currentPath.startsWith(item.path) &&
+          item.path.length > bestMatchLen) {
         // Avoid root-path false-positives (e.g. /manager matching /manager/slots)
         final afterPrefix = currentPath.substring(item.path.length);
         if (afterPrefix.isEmpty || afterPrefix.startsWith('/')) {
@@ -133,8 +134,9 @@ class _MobileLayout extends StatelessWidget {
         backgroundColor: AppColors.surface,
         elevation: 0,
         toolbarHeight: ScreenUtils.sh(52),
+        centerTitle: true,
         title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
@@ -189,7 +191,8 @@ class _MobileLayout extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: ScreenUtils.sw(4)),
-                      Icon(Icons.expand_more, color: accentColor, size: ScreenUtils.sp(16)),
+                      Icon(Icons.expand_more,
+                          color: accentColor, size: ScreenUtils.sp(16)),
                     ],
                   ),
                 ),
@@ -242,7 +245,7 @@ class _MobileLayout extends StatelessWidget {
         ),
         child: SafeArea(
           child: SizedBox(
-            height: ScreenUtils.sh(58),
+            height: ScreenUtils.sh(58).clamp(58.0, 72.0).toDouble(),
             child: Row(
               children: List.generate(items.length, (i) {
                 final item = items[i];
@@ -307,16 +310,19 @@ class _BottomNavItem extends StatelessWidget {
               ),
             ),
             SizedBox(height: ScreenUtils.sh(2)),
-            Text(
-              item.label,
-              style: TextStyle(
-                color: isActive ? accentColor : AppColors.textMuted,
-                fontSize: ScreenUtils.sp(9),
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                item.label,
+                style: TextStyle(
+                  color: isActive ? accentColor : AppColors.textMuted,
+                  fontSize: ScreenUtils.sp(9),
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
             ),
           ],
         ),

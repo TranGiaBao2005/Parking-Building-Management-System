@@ -158,7 +158,8 @@ class MockDataService extends ChangeNotifier {
         slots.add(ParkingSlot(
           id: 'sl${slotNum.toString().padLeft(3, '0')}',
           floorId: floor.id,
-          slotCode: '${floor.floorNumber}M${(i + 1).toString().padLeft(2, '0')}',
+          slotCode:
+              '${floor.floorNumber}M${(i + 1).toString().padLeft(2, '0')}',
           allowedType: VehicleType.motorbike,
           status: status,
         ));
@@ -191,7 +192,8 @@ class MockDataService extends ChangeNotifier {
 
     // Floor 4: car + truck
     for (int i = 0; i < 20; i++) {
-      final status = _random.nextBool() ? SlotStatus.occupied : SlotStatus.available;
+      final status =
+          _random.nextBool() ? SlotStatus.occupied : SlotStatus.available;
       slots.add(ParkingSlot(
         id: 'sl${slotNum.toString().padLeft(3, '0')}',
         floorId: 'f4',
@@ -202,7 +204,8 @@ class MockDataService extends ChangeNotifier {
       slotNum++;
     }
     for (int i = 0; i < 10; i++) {
-      final status = _random.nextBool() ? SlotStatus.occupied : SlotStatus.available;
+      final status =
+          _random.nextBool() ? SlotStatus.occupied : SlotStatus.available;
       slots.add(ParkingSlot(
         id: 'sl${slotNum.toString().padLeft(3, '0')}',
         floorId: 'f4',
@@ -246,11 +249,24 @@ class MockDataService extends ChangeNotifier {
   void _initSessions() {
     sessions = [];
     final plates = [
-      '51A-12345', '59B-67890', '51C-11223', '43D-55678',
-      '29E-99001', '51F-44332', '30G-88765', '51H-22110',
-      '51K-77654', '61L-33219', '51M-66543', '92N-12398',
+      '51A-12345',
+      '59B-67890',
+      '51C-11223',
+      '43D-55678',
+      '29E-99001',
+      '51F-44332',
+      '30G-88765',
+      '51H-22110',
+      '51K-77654',
+      '61L-33219',
+      '51M-66543',
+      '92N-12398',
     ];
-    final vehicleTypes = [VehicleType.motorbike, VehicleType.car, VehicleType.truck];
+    final vehicleTypes = [
+      VehicleType.motorbike,
+      VehicleType.car,
+      VehicleType.truck
+    ];
 
     // Past completed sessions (last 7 days)
     for (int day = 6; day >= 1; day--) {
@@ -290,8 +306,14 @@ class MockDataService extends ChangeNotifier {
 
     // Today active sessions
     final activePlates = [
-      '51A-78901', '51B-23456', '43C-34567', '29D-45678',
-      '51E-56789', '61F-67890', '30G-78901', '92H-89012',
+      '51A-78901',
+      '51B-23456',
+      '43C-34567',
+      '29D-45678',
+      '51E-56789',
+      '61F-67890',
+      '30G-78901',
+      '92H-89012',
     ];
     for (int i = 0; i < activePlates.length; i++) {
       final plate = activePlates[i];
@@ -487,7 +509,10 @@ class MockDataService extends ChangeNotifier {
 
   ParkingSlot? _availableSlotForFloor(String floorId, VehicleType type) {
     final floorSlots = slots
-        .where((s) => s.floorId == floorId && s.status == SlotStatus.available && s.allowedType == type)
+        .where((s) =>
+            s.floorId == floorId &&
+            s.status == SlotStatus.available &&
+            s.allowedType == type)
         .toList();
     if (floorSlots.isEmpty) return null;
     return floorSlots[_random.nextInt(floorSlots.length)];
@@ -507,11 +532,38 @@ class MockDataService extends ChangeNotifier {
   // ─────────── Auth ───────────
   bool login(String username, String password) {
     final user = users.where((u) => u.username == username).firstOrNull;
-    if (user == null) return false;
+    if (user == null || user.status != UserStatus.active) return false;
     // Demo: any password works
     currentUser = user;
     notifyListeners();
     return true;
+  }
+
+  AppUser? registerDriver({
+    required String username,
+    required String fullName,
+    required String email,
+    required String phone,
+  }) {
+    final normalizedUsername = username.trim().toLowerCase();
+    final alreadyExists = users.any(
+      (u) => u.username.toLowerCase() == normalizedUsername,
+    );
+    if (alreadyExists) return null;
+
+    final user = AppUser(
+      id: _uuid.v4(),
+      username: normalizedUsername,
+      fullName: fullName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      role: UserRole.driver,
+      createdAt: DateTime.now(),
+    );
+    users.add(user);
+    currentUser = user;
+    notifyListeners();
+    return user;
   }
 
   void logout() {
@@ -523,11 +575,13 @@ class MockDataService extends ChangeNotifier {
   List<ParkingSlot> slotsForFloor(String floorId) =>
       slots.where((s) => s.floorId == floorId).toList();
 
-  int availableCount(String floorId) =>
-      slots.where((s) => s.floorId == floorId && s.status == SlotStatus.available).length;
+  int availableCount(String floorId) => slots
+      .where((s) => s.floorId == floorId && s.status == SlotStatus.available)
+      .length;
 
-  int occupiedCount(String floorId) =>
-      slots.where((s) => s.floorId == floorId && s.status == SlotStatus.occupied).length;
+  int occupiedCount(String floorId) => slots
+      .where((s) => s.floorId == floorId && s.status == SlotStatus.occupied)
+      .length;
 
   int totalAvailable() =>
       slots.where((s) => s.status == SlotStatus.available).length;
@@ -608,7 +662,10 @@ class MockDataService extends ChangeNotifier {
 
   List<ParkingSession> activeSessionsForUser(String userId) {
     // In real system, sessions would link to userId. For demo, show last 3 active.
-    return sessions.where((s) => s.status == SessionStatus.active).take(3).toList();
+    return sessions
+        .where((s) => s.status == SessionStatus.active)
+        .take(3)
+        .toList();
   }
 
   List<ParkingSession> get activeSessions =>
@@ -683,7 +740,8 @@ class MockDataService extends ChangeNotifier {
   }
 
   // ─────────── Pricing operations ───────────
-  void updatePricing(String policyId, double ratePerHour, double? overnightRate, double? monthlyRate) {
+  void updatePricing(String policyId, double ratePerHour, double? overnightRate,
+      double? monthlyRate) {
     final policy = pricingPolicies.where((p) => p.id == policyId).firstOrNull;
     if (policy == null) return;
     policy.ratePerHour = ratePerHour;
@@ -694,9 +752,10 @@ class MockDataService extends ChangeNotifier {
 
   double getPriceForType(VehicleType type) {
     return pricingPolicies
-        .where((p) => p.vehicleType == type)
-        .firstOrNull
-        ?.ratePerHour ?? 5000;
+            .where((p) => p.vehicleType == type)
+            .firstOrNull
+            ?.ratePerHour ??
+        5000;
   }
 
   // ─────────── Reports ───────────
@@ -834,8 +893,9 @@ class MockDataService extends ChangeNotifier {
   void toggleUserStatus(String userId) {
     final user = users.where((u) => u.id == userId).firstOrNull;
     if (user == null) return;
-    user.status =
-        user.status == UserStatus.active ? UserStatus.inactive : UserStatus.active;
+    user.status = user.status == UserStatus.active
+        ? UserStatus.inactive
+        : UserStatus.active;
     notifyListeners();
   }
 
@@ -846,7 +906,7 @@ class MockDataService extends ChangeNotifier {
     // Count slots and occupancy by type
     int mbTotal = 0, mbOcc = 0;
     int carTotal = 0, carOcc = 0;
-    
+
     for (final s in slots) {
       if (s.allowedType == VehicleType.motorbike) {
         mbTotal++;
@@ -863,13 +923,19 @@ class MockDataService extends ChangeNotifier {
     // Rule 1: High motorbike demand, low car demand
     if (mbRate > 0.6 && carRate < 0.6) {
       // Find empty car slots to convert
-      final emptyCarSlots = slots.where((s) => s.allowedType == VehicleType.car && s.status == SlotStatus.available).toList();
+      final emptyCarSlots = slots
+          .where((s) =>
+              s.allowedType == VehicleType.car &&
+              s.status == SlotStatus.available)
+          .toList();
       if (emptyCarSlots.length >= 5) {
         final toConvert = emptyCarSlots.take(5).map((s) => s.id).toList();
         recommendations.add(AiRecommendation(
           title: 'Quá tải khu vực Xe máy',
-          description: 'Tỷ lệ lấp đầy xe máy đạt ${(mbRate * 100).toStringAsFixed(1)}%, trong khi ô tô chỉ đạt ${(carRate * 100).toStringAsFixed(1)}%. Khách hàng đi xe máy đang mất nhiều thời gian tìm chỗ trống.',
-          impact: 'Gộp 5 slot ô tô trống thành 15 slot xe máy tạm thời để giảm kẹt xe và tăng tỷ lệ lấp đầy.',
+          description:
+              'Tỷ lệ lấp đầy xe máy đạt ${(mbRate * 100).toStringAsFixed(1)}%, trong khi ô tô chỉ đạt ${(carRate * 100).toStringAsFixed(1)}%. Khách hàng đi xe máy đang mất nhiều thời gian tìm chỗ trống.',
+          impact:
+              'Gộp 5 slot ô tô trống thành 15 slot xe máy tạm thời để giảm kẹt xe và tăng tỷ lệ lấp đầy.',
           fromType: VehicleType.car,
           toType: VehicleType.motorbike,
           slotsToConvert: 5,
@@ -881,13 +947,19 @@ class MockDataService extends ChangeNotifier {
 
     // Rule 2: High car demand, low motorbike demand
     if (carRate > 0.6 && mbRate < 0.6) {
-      final emptyMbSlots = slots.where((s) => s.allowedType == VehicleType.motorbike && s.status == SlotStatus.available).toList();
+      final emptyMbSlots = slots
+          .where((s) =>
+              s.allowedType == VehicleType.motorbike &&
+              s.status == SlotStatus.available)
+          .toList();
       if (emptyMbSlots.length >= 15) {
         final toConvert = emptyMbSlots.take(15).map((s) => s.id).toList();
         recommendations.add(AiRecommendation(
           title: 'Khu vực Ô tô sắp đầy',
-          description: 'Tỷ lệ lấp đầy ô tô đạt ${(carRate * 100).toStringAsFixed(1)}%. Khu vực xe máy còn nhiều chỗ trống (${(mbRate * 100).toStringAsFixed(1)}%).',
-          impact: 'Gộp 15 slot xe máy trống thành 5 slot ô tô. Tăng doanh thu thêm ~15% trong khung giờ cao điểm.',
+          description:
+              'Tỷ lệ lấp đầy ô tô đạt ${(carRate * 100).toStringAsFixed(1)}%. Khu vực xe máy còn nhiều chỗ trống (${(mbRate * 100).toStringAsFixed(1)}%).',
+          impact:
+              'Gộp 15 slot xe máy trống thành 5 slot ô tô. Tăng doanh thu thêm ~15% trong khung giờ cao điểm.',
           fromType: VehicleType.motorbike,
           toType: VehicleType.car,
           slotsToConvert: 15,
@@ -899,13 +971,19 @@ class MockDataService extends ChangeNotifier {
 
     // Default if no big difference just to show the feature
     if (recommendations.isEmpty) {
-      final emptyCarSlots = slots.where((s) => s.allowedType == VehicleType.car && s.status == SlotStatus.available).toList();
+      final emptyCarSlots = slots
+          .where((s) =>
+              s.allowedType == VehicleType.car &&
+              s.status == SlotStatus.available)
+          .toList();
       if (emptyCarSlots.isNotEmpty) {
         final toConvert = emptyCarSlots.take(2).map((s) => s.id).toList();
         recommendations.add(AiRecommendation(
           title: 'Tối ưu Tỷ suất lợi nhuận',
-          description: 'AI phát hiện lượng xe máy có xu hướng tăng vào giờ này. Hiện còn ${emptyCarSlots.length} slot ô tô trống ở Tầng ${emptyCarSlots.first.floorId.replaceAll('f', '')}.',
-          impact: 'Chuyển đổi linh hoạt 2 slot ô tô thành các slot xe máy giúp tận dụng tối đa không gian chờ.',
+          description:
+              'AI phát hiện lượng xe máy có xu hướng tăng vào giờ này. Hiện còn ${emptyCarSlots.length} slot ô tô trống ở Tầng ${emptyCarSlots.first.floorId.replaceAll('f', '')}.',
+          impact:
+              'Chuyển đổi linh hoạt 2 slot ô tô thành các slot xe máy giúp tận dụng tối đa không gian chờ.',
           fromType: VehicleType.car,
           toType: VehicleType.motorbike,
           slotsToConvert: 2,

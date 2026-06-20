@@ -4,10 +4,9 @@ class Responsive {
   static const double mobileBreakpoint = 600;
 
   static bool isMobile(BuildContext context) =>
-      MediaQuery.of(context).size.width < mobileBreakpoint;
+      MediaQuery.sizeOf(context).shortestSide < mobileBreakpoint;
 
-  static bool isDesktop(BuildContext context) =>
-      MediaQuery.of(context).size.width >= mobileBreakpoint;
+  static bool isDesktop(BuildContext context) => !isMobile(context);
 }
 
 /// Adaptive sizing utility.
@@ -49,7 +48,8 @@ class ScreenUtils {
   static double p(double size) => size * _scaleW;
 
   /// Responsive horizontal padding for screens
-  static double get screenPaddingH => _screenWidth < 400 ? 16.0 * _scaleW : 20.0 * _scaleW;
+  static double get screenPaddingH =>
+      _screenWidth < 400 ? 16.0 * _scaleW : 20.0 * _scaleW;
 
   /// Responsive vertical padding for screens
   static double get screenPaddingV => 16.0 * _scaleH;

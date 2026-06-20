@@ -28,27 +28,44 @@ class ManagerDashboardScreen extends StatelessWidget {
           children: [
             // Header
             Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              runSpacing: 8,
+              alignment:
+                  isMobile ? WrapAlignment.center : WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: 12,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Tổng quan hệ thống',
-                        style: Theme.of(context).textTheme.displayMedium),
-                    const SizedBox(height: 4),
-                    Text(
-                      DateFormat('EEEE, d MMMM yyyy', 'vi').format(DateTime.now()),
-                      style: const TextStyle(color: AppColors.textSecondary),
-                    ),
-                  ],
+                SizedBox(
+                  width: isMobile ? double.infinity : null,
+                  child: Column(
+                    crossAxisAlignment: isMobile
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tổng quan hệ thống',
+                        textAlign: TextAlign.center,
+                        style:
+                            Theme.of(context).textTheme.displayMedium?.copyWith(
+                                  fontSize: isMobile ? 22 : null,
+                                ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        DateFormat('EEEE, d MMMM yyyy', 'vi')
+                            .format(DateTime.now()),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: AppColors.textSecondary),
+                      ),
+                    ],
+                  ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: AppColors.available.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.available.withOpacity(0.3)),
+                    border:
+                        Border.all(color: AppColors.available.withOpacity(0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -81,36 +98,33 @@ class ManagerDashboardScreen extends StatelessWidget {
             const SizedBox(height: 28),
 
             // Charts row — Column on mobile, Row on desktop
-            if (isMobile) ...
-              [
-                _HourlyChart(svc: svc),
-                const SizedBox(height: 16),
-                _FloorOccupancyCard(svc: svc),
-                const SizedBox(height: 16),
-                _RevenueChart(svc: svc, fmt: fmt),
-                const SizedBox(height: 16),
-                _ActiveSessionsList(svc: svc),
-              ]
-            else ...
-              [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 3, child: _HourlyChart(svc: svc)),
-                    const SizedBox(width: 20),
-                    Expanded(flex: 2, child: _FloorOccupancyCard(svc: svc)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 3, child: _RevenueChart(svc: svc, fmt: fmt)),
-                    const SizedBox(width: 20),
-                    Expanded(flex: 2, child: _ActiveSessionsList(svc: svc)),
-                  ],
-                ),
-              ],
+            if (isMobile) ...[
+              _HourlyChart(svc: svc),
+              const SizedBox(height: 16),
+              _FloorOccupancyCard(svc: svc),
+              const SizedBox(height: 16),
+              _RevenueChart(svc: svc, fmt: fmt),
+              const SizedBox(height: 16),
+              _ActiveSessionsList(svc: svc),
+            ] else ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 3, child: _HourlyChart(svc: svc)),
+                  const SizedBox(width: 20),
+                  Expanded(flex: 2, child: _FloorOccupancyCard(svc: svc)),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 3, child: _RevenueChart(svc: svc, fmt: fmt)),
+                  const SizedBox(width: 20),
+                  Expanded(flex: 2, child: _ActiveSessionsList(svc: svc)),
+                ],
+              ),
+            ],
           ],
         ),
       ),
@@ -191,7 +205,10 @@ class _StatCards extends StatelessWidget {
           return SizedBox(
             width: cardWidth,
             child: _StatCard(data: card),
-          ).animate().fadeIn(delay: Duration(milliseconds: 100 + e.key * 60)).slideY(begin: 0.2);
+          )
+              .animate()
+              .fadeIn(delay: Duration(milliseconds: 100 + e.key * 60))
+              .slideY(begin: 0.2);
         }).toList(),
       );
     });
@@ -232,9 +249,18 @@ class _StatCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(data.label,
-                  style: const TextStyle(
-                      color: AppColors.textSecondary, fontSize: 13)),
+              Expanded(
+                child: Text(
+                  data.label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: Responsive.isMobile(context) ? 11 : 13,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
               Container(
                 width: 36,
                 height: 36,
@@ -249,9 +275,11 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             data.value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: data.color,
-              fontSize: 26,
+              fontSize: Responsive.isMobile(context) ? 20 : 26,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -305,9 +333,12 @@ class _HourlyChart extends StatelessWidget {
                   ),
                 ),
                 titlesData: FlTitlesData(
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -335,7 +366,8 @@ class _HourlyChart extends StatelessWidget {
                           colors: [AppColors.primary, AppColors.accent],
                         ),
                         width: 12,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(4)),
                       ),
                     ],
                   );
@@ -369,7 +401,8 @@ class _FloorOccupancyCard extends StatelessWidget {
             children: [
               const Icon(Icons.layers, color: AppColors.accent, size: 18),
               const SizedBox(width: 8),
-              Text('Lấp đầy theo tầng', style: Theme.of(context).textTheme.titleMedium),
+              Text('Lấp đầy theo tầng',
+                  style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
           const SizedBox(height: 20),
@@ -428,7 +461,8 @@ class _RevenueChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = svc.dailyRevenue7Days();
-    final maxRev = data.fold(0.0, (m, d) => d['revenue'] > m ? d['revenue'] as double : m);
+    final maxRev =
+        data.fold(0.0, (m, d) => d['revenue'] > m ? d['revenue'] as double : m);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -445,13 +479,16 @@ class _RevenueChart extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.trending_up, color: Color(0xFF10B981), size: 18),
+                  const Icon(Icons.trending_up,
+                      color: Color(0xFF10B981), size: 18),
                   const SizedBox(width: 8),
-                  Text('Doanh thu 7 ngày qua', style: Theme.of(context).textTheme.titleMedium),
+                  Text('Doanh thu 7 ngày qua',
+                      style: Theme.of(context).textTheme.titleMedium),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFF10B981).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -483,9 +520,12 @@ class _RevenueChart extends StatelessWidget {
                   ),
                 ),
                 titlesData: FlTitlesData(
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -493,7 +533,8 @@ class _RevenueChart extends StatelessWidget {
                         final day = data[value.toInt()]['day'] as DateTime;
                         return Text(
                           DateFormat('dd/MM').format(day),
-                          style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                          style: const TextStyle(
+                              color: AppColors.textMuted, fontSize: 10),
                         );
                       },
                       reservedSize: 24,
@@ -505,7 +546,8 @@ class _RevenueChart extends StatelessWidget {
                 lineBarsData: [
                   LineChartBarData(
                     spots: data.asMap().entries.map((e) {
-                      return FlSpot(e.key.toDouble(), e.value['revenue'] as double);
+                      return FlSpot(
+                          e.key.toDouble(), e.value['revenue'] as double);
                     }).toList(),
                     isCurved: true,
                     gradient: const LinearGradient(
@@ -554,9 +596,11 @@ class _ActiveSessionsList extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.directions_car, color: AppColors.reserved, size: 18),
+              const Icon(Icons.directions_car,
+                  color: AppColors.reserved, size: 18),
               const SizedBox(width: 8),
-              Text('Xe đang gửi', style: Theme.of(context).textTheme.titleMedium),
+              Text('Xe đang gửi',
+                  style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -566,7 +610,10 @@ class _ActiveSessionsList extends StatelessWidget {
                 ),
                 child: Text(
                   '${svc.activeSessions.length}',
-                  style: const TextStyle(color: AppColors.reserved, fontSize: 12, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: AppColors.reserved,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -576,7 +623,8 @@ class _ActiveSessionsList extends StatelessWidget {
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(20),
-                child: Text('Không có xe nào đang gửi', style: TextStyle(color: AppColors.textMuted)),
+                child: Text('Không có xe nào đang gửi',
+                    style: TextStyle(color: AppColors.textMuted)),
               ),
             )
           else
@@ -593,7 +641,8 @@ class _ActiveSessionsList extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Text(s.vehicleType.icon, style: const TextStyle(fontSize: 20)),
+                    Text(s.vehicleType.icon,
+                        style: const TextStyle(fontSize: 20)),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
@@ -605,7 +654,8 @@ class _ActiveSessionsList extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13)),
                           Text('Slot ${s.slotCode}  •  ${hrs}g${mins}m',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                              style: const TextStyle(
+                                  color: AppColors.textMuted, fontSize: 11)),
                         ],
                       ),
                     ),

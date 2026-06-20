@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../core/models/models.dart';
+import '../../shared/utils/responsive.dart';
 
 class ExceptionManagementScreen extends StatefulWidget {
   const ExceptionManagementScreen({super.key});
@@ -15,8 +16,7 @@ class ExceptionManagementScreen extends StatefulWidget {
       _ExceptionManagementScreenState();
 }
 
-class _ExceptionManagementScreenState
-    extends State<ExceptionManagementScreen> {
+class _ExceptionManagementScreenState extends State<ExceptionManagementScreen> {
   ExceptionType? _filterType; // null = hiển thị tất cả
   String _searchText = '';
   final _searchCtrl = TextEditingController();
@@ -31,6 +31,7 @@ class _ExceptionManagementScreenState
   @override
   Widget build(BuildContext context) {
     final svc = context.watch<MockDataService>();
+    final isMobile = Responsive.isMobile(context);
 
     // Lấy tất cả sessions có exception (bao gồm đã resolved để lịch sử)
     final allExceptions = svc.sessions
@@ -38,8 +39,9 @@ class _ExceptionManagementScreenState
         .toList()
       ..sort((a, b) => b.entryTime.compareTo(a.entryTime));
 
-    final activeExceptions =
-        allExceptions.where((s) => s.status == SessionStatus.exception).toList();
+    final activeExceptions = allExceptions
+        .where((s) => s.status == SessionStatus.exception)
+        .toList();
 
     // Lọc theo type + search
     final filtered = allExceptions.where((s) {
@@ -53,7 +55,7 @@ class _ExceptionManagementScreenState
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Padding(
-        padding: const EdgeInsets.all(28),
+        padding: EdgeInsets.all(isMobile ? 16 : 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -71,27 +73,11 @@ class _ExceptionManagementScreenState
 
             // ── Body: chart (left) + list (right) ───────────────────
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Left: Donut chart + type filter
-                  SizedBox(
-                    width: 260,
-                    child: _LeftPanel(
-                      allExceptions: allExceptions,
-                      selected: _filterType,
-                      onSelect: (t) =>
-                          setState(() => _filterType = _filterType == t ? null : t),
-                    ),
-                  ).animate().fadeIn(delay: 200.ms),
-                  const SizedBox(width: 20),
-
-                  // Right: search + list
-                  Expanded(
-                    child: Column(
+              child: isMobile
+                  ? Column(
                       children: [
                         _buildSearchBar(),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         Expanded(
                           child: _ExceptionList(
                             sessions: filtered,
@@ -99,15 +85,45 @@ class _ExceptionManagementScreenState
                             onResolve: (s) =>
                                 _showResolveDialog(context, svc, s),
                             onMarkException: (s, type) =>
-                                _showMarkExceptionDialog(
-                                    context, svc, s, type),
+                                _showMarkExceptionDialog(context, svc, s, type),
                           ),
                         ),
                       ],
-                    ).animate().fadeIn(delay: 250.ms),
-                  ),
-                ],
-              ),
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          width: 260,
+                          child: _LeftPanel(
+                            allExceptions: allExceptions,
+                            selected: _filterType,
+                            onSelect: (t) => setState(() =>
+                                _filterType = _filterType == t ? null : t),
+                          ),
+                        ).animate().fadeIn(delay: 200.ms),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              _buildSearchBar(),
+                              const SizedBox(height: 14),
+                              Expanded(
+                                child: _ExceptionList(
+                                  sessions: filtered,
+                                  dtFmt: dtFmt,
+                                  onResolve: (s) =>
+                                      _showResolveDialog(context, svc, s),
+                                  onMarkException: (s, type) =>
+                                      _showMarkExceptionDialog(
+                                          context, svc, s, type),
+                                ),
+                              ),
+                            ],
+                          ).animate().fadeIn(delay: 250.ms),
+                        ),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -117,14 +133,48 @@ class _ExceptionManagementScreenState
 
   // ── Header ─────────────────────────────────────────────────────────
   Widget _buildHeader(BuildContext context, int activeCount) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final isMobile = Responsive.isMobile(context);
+    if (isMobile) {
+      return SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Quản lý Ngoại lệ',
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .displayMedium
+                  ?.copyWith(fontSize: 22),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Theo dõi và xử lý các trường hợp bất thường',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+            ),
+            if (activeCount > 0) ...[
+              const SizedBox(height: 12),
+              Center(child: _buildActiveBadge(activeCount)),
+            ],
+          ],
+        ),
+      );
+    }
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 12,
+      runSpacing: 12,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Quản lý Ngoại lệ',
-                style: Theme.of(context).textTheme.displayMedium),
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      fontSize: isMobile ? 22 : null,
+                    )),
             const SizedBox(height: 4),
             const Text(
               'Theo dõi & xử lý mất vé, sai biển số, quá giờ, sai khu vực, chưa thanh toán',
@@ -132,39 +182,35 @@ class _ExceptionManagementScreenState
             ),
           ],
         ),
-        if (activeCount > 0)
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFEF4444), Color(0xFFF97316)],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.occupied.withOpacity(0.35),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.warning_rounded,
-                    color: Colors.white, size: 16),
-                const SizedBox(width: 8),
-                Text(
-                  '$activeCount trường hợp cần xử lý',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13),
-                ),
-              ],
+        if (activeCount > 0) _buildActiveBadge(activeCount),
+      ],
+    );
+  }
+
+  Widget _buildActiveBadge(int activeCount) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFEF4444), Color(0xFFF97316)],
+        ),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.warning_rounded, color: Colors.white, size: 16),
+          const SizedBox(width: 7),
+          Text(
+            '$activeCount trường hợp cần xử lý',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
           ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -190,8 +236,8 @@ class _ExceptionManagementScreenState
                       },
                     )
                   : null,
-              contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
             onChanged: (v) => setState(() => _searchText = v),
           ),
@@ -200,8 +246,7 @@ class _ExceptionManagementScreenState
         // Filter active badge
         if (_filterType != null)
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: _exTypeColor(_filterType!).withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
@@ -233,8 +278,7 @@ class _ExceptionManagementScreenState
   // ── Dialogs ─────────────────────────────────────────────────────────
   void _showResolveDialog(
       BuildContext context, MockDataService svc, ParkingSession session) {
-    final noteCtrl =
-        TextEditingController(text: session.exceptionNote ?? '');
+    final noteCtrl = TextEditingController(text: session.exceptionNote ?? '');
     String selectedAction = 'resolve';
 
     showDialog(
@@ -386,8 +430,7 @@ class _ExceptionManagementScreenState
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Đánh dấu: ${type.label}',
             style: const TextStyle(color: AppColors.textPrimary)),
         content: SizedBox(
@@ -404,8 +447,7 @@ class _ExceptionManagementScreenState
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Hủy')),
+              onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
           ElevatedButton(
             onPressed: () {
               svc.markAsException(
@@ -421,8 +463,8 @@ class _ExceptionManagementScreenState
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-                backgroundColor: _exTypeColor(type)),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: _exTypeColor(type)),
             child: const Text('Đánh dấu'),
           ),
         ],
@@ -445,9 +487,8 @@ class _LeftPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final types = ExceptionType.values
-        .where((t) => t != ExceptionType.none)
-        .toList();
+    final types =
+        ExceptionType.values.where((t) => t != ExceptionType.none).toList();
 
     return Column(
       children: [
@@ -474,23 +515,26 @@ class _LeftPanel extends StatelessWidget {
                         PieChartData(
                           sectionsSpace: 3,
                           centerSpaceRadius: 36,
-                          sections: types.map((t) {
-                            final count = allExceptions
-                                .where((s) => s.exceptionType == t)
-                                .length;
-                            if (count == 0) return null;
-                            return PieChartSectionData(
-                              value: count.toDouble(),
-                              color: _exTypeColor(t),
-                              radius: selected == t ? 50 : 40,
-                              title: '$count',
-                              titleStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            );
-                          }).whereType<PieChartSectionData>().toList(),
+                          sections: types
+                              .map((t) {
+                                final count = allExceptions
+                                    .where((s) => s.exceptionType == t)
+                                    .length;
+                                if (count == 0) return null;
+                                return PieChartSectionData(
+                                  value: count.toDouble(),
+                                  color: _exTypeColor(t),
+                                  radius: selected == t ? 50 : 40,
+                                  title: '$count',
+                                  titleStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              })
+                              .whereType<PieChartSectionData>()
+                              .toList(),
                         ),
                       ),
               ),
@@ -516,79 +560,78 @@ class _LeftPanel extends StatelessWidget {
                         color: AppColors.textSecondary, fontSize: 12)),
                 const SizedBox(height: 12),
                 ...types.map((t) {
-                final count = allExceptions
-                    .where((s) => s.exceptionType == t)
-                    .length;
-                final activeCount = allExceptions
-                    .where((s) =>
-                        s.exceptionType == t &&
-                        s.status == SessionStatus.exception)
-                    .length;
-                final isSelected = selected == t;
-                return GestureDetector(
-                  onTap: () => onSelect(t),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? _exTypeColor(t).withOpacity(0.15)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
-                      border: isSelected
-                          ? Border.all(
-                              color: _exTypeColor(t).withOpacity(0.5))
-                          : Border.all(color: Colors.transparent),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(_exTypeIcon(t),
-                            color: _exTypeColor(t), size: 16),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(t.label,
-                                  style: TextStyle(
-                                      color: isSelected
-                                          ? _exTypeColor(t)
-                                          : AppColors.textPrimary,
-                                      fontSize: 12,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.normal)),
-                              if (activeCount > 0)
-                                Text('$activeCount đang chờ',
+                  final count =
+                      allExceptions.where((s) => s.exceptionType == t).length;
+                  final activeCount = allExceptions
+                      .where((s) =>
+                          s.exceptionType == t &&
+                          s.status == SessionStatus.exception)
+                      .length;
+                  final isSelected = selected == t;
+                  return GestureDetector(
+                    onTap: () => onSelect(t),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? _exTypeColor(t).withOpacity(0.15)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                        border: isSelected
+                            ? Border.all(
+                                color: _exTypeColor(t).withOpacity(0.5))
+                            : Border.all(color: Colors.transparent),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(_exTypeIcon(t),
+                              color: _exTypeColor(t), size: 16),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(t.label,
                                     style: TextStyle(
-                                        color: _exTypeColor(t),
-                                        fontSize: 10)),
-                            ],
+                                        color: isSelected
+                                            ? _exTypeColor(t)
+                                            : AppColors.textPrimary,
+                                        fontSize: 12,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.normal)),
+                                if (activeCount > 0)
+                                  Text('$activeCount đang chờ',
+                                      style: TextStyle(
+                                          color: _exTypeColor(t),
+                                          fontSize: 10)),
+                              ],
+                            ),
                           ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: _exTypeColor(t).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 7, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: _exTypeColor(t).withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text('$count',
+                                style: TextStyle(
+                                    color: _exTypeColor(t),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold)),
                           ),
-                          child: Text('$count',
-                              style: TextStyle(
-                                  color: _exTypeColor(t),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }),
-            ],
+                  );
+                }),
+              ],
+            ),
           ),
-        ),
         ),
       ],
     );
@@ -604,11 +647,11 @@ class _SummaryCards extends StatelessWidget {
   Widget build(BuildContext context) {
     final active =
         allExceptions.where((s) => s.status == SessionStatus.exception).length;
-    final resolved = allExceptions
-        .where((s) => s.status != SessionStatus.exception)
+    final resolved =
+        allExceptions.where((s) => s.status != SessionStatus.exception).length;
+    final overtime = allExceptions
+        .where((s) => s.exceptionType == ExceptionType.overtime)
         .length;
-    final overtime =
-        allExceptions.where((s) => s.exceptionType == ExceptionType.overtime).length;
     final lostTicket = allExceptions
         .where((s) => s.exceptionType == ExceptionType.lostTicket)
         .length;
@@ -634,22 +677,33 @@ class _SummaryCards extends StatelessWidget {
           Icons.money_off_outlined),
     ];
 
-    return Row(
-      children: stats
-          .asMap()
-          .entries
-          .map(
-            (e) => Expanded(
+    final isMobile = Responsive.isMobile(context);
+    if (isMobile) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: stats.asMap().entries.map((e) {
+            return SizedBox(
+              width: 145,
               child: Padding(
-                padding: EdgeInsets.only(right: e.key < stats.length - 1 ? 12 : 0),
-                child: _StatCard(stat: e.value)
-                    .animate()
-                    .fadeIn(delay: Duration(milliseconds: 80 * e.key))
-                    .slideY(begin: 0.15),
+                padding: const EdgeInsets.only(right: 10),
+                child: _StatCard(stat: e.value),
               ),
-            ),
-          )
-          .toList(),
+            );
+          }).toList(),
+        ),
+      );
+    }
+
+    return Row(
+      children: stats.asMap().entries.map((e) {
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: e.key < stats.length - 1 ? 12 : 0),
+            child: _StatCard(stat: e.value),
+          ),
+        );
+      }).toList(),
     );
   }
 }
@@ -680,9 +734,16 @@ class _StatCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(stat.label,
+              Expanded(
+                child: Text(
+                  stat.label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: AppColors.textSecondary, fontSize: 12)),
+                      color: AppColors.textSecondary, fontSize: 11),
+                ),
+              ),
+              const SizedBox(width: 6),
               Icon(stat.icon, color: stat.color, size: 16),
             ],
           ),
@@ -720,13 +781,12 @@ class _ExceptionList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.check_circle_outline,
-                color: AppColors.available, size: 64)
+                    color: AppColors.available, size: 64)
                 .animate(onPlay: (c) => c.repeat())
                 .shimmer(duration: 2.seconds, color: AppColors.available),
             const SizedBox(height: 16),
             const Text('Không tìm thấy ngoại lệ nào phù hợp',
-                style: TextStyle(
-                    color: AppColors.textSecondary, fontSize: 15)),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 15)),
           ],
         ),
       );
@@ -781,9 +841,7 @@ class _ExceptionCardState extends State<_ExceptionCard> {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isResolved
-              ? AppColors.border
-              : color.withOpacity(0.45),
+          color: isResolved ? AppColors.border : color.withOpacity(0.45),
           width: isResolved ? 1 : 1.5,
         ),
       ),
@@ -804,9 +862,7 @@ class _ExceptionCardState extends State<_ExceptionCard> {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(_exTypeIcon(s.exceptionType),
-                      color: isResolved
-                          ? color.withOpacity(0.5)
-                          : color,
+                      color: isResolved ? color.withOpacity(0.5) : color,
                       size: 20),
                 ),
                 const SizedBox(width: 14),
@@ -837,38 +893,50 @@ class _ExceptionCardState extends State<_ExceptionCard> {
                           ),
                           const SizedBox(width: 8),
                           // Status badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
+                          if (Responsive.isMobile(context))
+                            Icon(
+                              isResolved
+                                  ? Icons.check_circle
+                                  : Icons.warning_rounded,
                               color: isResolved
-                                  ? AppColors.available.withOpacity(0.1)
-                                  : AppColors.occupied.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
+                                  ? AppColors.available
+                                  : AppColors.occupied,
+                              size: 15,
+                            )
+                          else
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: isResolved
+                                    ? AppColors.available.withOpacity(0.1)
+                                    : AppColors.occupied.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                isResolved ? '✓ Đã xử lý' : '⚠ Chờ xử lý',
+                                style: TextStyle(
+                                    color: isResolved
+                                        ? AppColors.available
+                                        : AppColors.occupied,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600),
+                              ),
                             ),
-                            child: Text(
-                              isResolved ? '✓ Đã xử lý' : '⚠ Chờ xử lý',
+                          if (!Responsive.isMobile(context)) ...[
+                            const Spacer(),
+                            Text(
+                              '${dur.inHours}g ${dur.inMinutes % 60}m',
                               style: TextStyle(
-                                  color: isResolved
-                                      ? AppColors.available
-                                      : AppColors.occupied,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600),
+                                  color: dur.inHours > 24
+                                      ? AppColors.occupied
+                                      : AppColors.textMuted,
+                                  fontSize: 11,
+                                  fontWeight: dur.inHours > 24
+                                      ? FontWeight.w600
+                                      : FontWeight.normal),
                             ),
-                          ),
-                          const Spacer(),
-                          // Duration
-                          Text(
-                            '${dur.inHours}g ${dur.inMinutes % 60}m',
-                            style: TextStyle(
-                                color: dur.inHours > 24
-                                    ? AppColors.occupied
-                                    : AppColors.textMuted,
-                                fontSize: 11,
-                                fontWeight: dur.inHours > 24
-                                    ? FontWeight.w600
-                                    : FontWeight.normal),
-                          ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -883,17 +951,21 @@ class _ExceptionCardState extends State<_ExceptionCard> {
                                 letterSpacing: 0.5),
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            '${s.vehicleType.icon} ${s.vehicleType.label}',
-                            style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 12),
+                          Expanded(
+                            child: Text(
+                              '${s.vehicleType.icon} ${s.vehicleType.label}',
+                              style: const TextStyle(
+                                  color: AppColors.textSecondary, fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Slot ${s.slotCode}  •  Vào: ${widget.dtFmt.format(s.entryTime)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             color: AppColors.textMuted, fontSize: 11),
                       ),
@@ -926,23 +998,31 @@ class _ExceptionCardState extends State<_ExceptionCard> {
                 Column(
                   children: [
                     if (isActive)
-                      ElevatedButton.icon(
-                        onPressed: widget.onResolve,
-                        icon: const Icon(Icons.check, size: 14),
-                        label: const Text('Xử lý', style: TextStyle(fontSize: 12)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: color,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ),
+                      Responsive.isMobile(context)
+                          ? IconButton.filled(
+                              onPressed: widget.onResolve,
+                              style:
+                                  IconButton.styleFrom(backgroundColor: color),
+                              icon: const Icon(Icons.check,
+                                  color: Colors.white, size: 18),
+                            )
+                          : ElevatedButton.icon(
+                              onPressed: widget.onResolve,
+                              icon: const Icon(Icons.check, size: 14),
+                              label: const Text('Xử lý',
+                                  style: TextStyle(fontSize: 12)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: color,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
                     const SizedBox(height: 6),
                     // Expand toggle
                     GestureDetector(
-                      onTap: () =>
-                          setState(() => _expanded = !_expanded),
+                      onTap: () => setState(() => _expanded = !_expanded),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 5),
@@ -950,22 +1030,31 @@ class _ExceptionCardState extends State<_ExceptionCard> {
                           color: AppColors.surfaceLight.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Row(
-                          children: [
-                            Text(
-                              _expanded ? 'Thu gọn' : 'Chi tiết',
-                              style: const TextStyle(
-                                  color: AppColors.textMuted, fontSize: 11),
-                            ),
-                            Icon(
-                              _expanded
-                                  ? Icons.expand_less
-                                  : Icons.expand_more,
-                              color: AppColors.textMuted,
-                              size: 14,
-                            ),
-                          ],
-                        ),
+                        child: Responsive.isMobile(context)
+                            ? Icon(
+                                _expanded
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: AppColors.textMuted,
+                                size: 18,
+                              )
+                            : Row(
+                                children: [
+                                  Text(
+                                    _expanded ? 'Thu gọn' : 'Chi tiết',
+                                    style: const TextStyle(
+                                        color: AppColors.textMuted,
+                                        fontSize: 11),
+                                  ),
+                                  Icon(
+                                    _expanded
+                                        ? Icons.expand_less
+                                        : Icons.expand_more,
+                                    color: AppColors.textMuted,
+                                    size: 14,
+                                  ),
+                                ],
+                              ),
                       ),
                     ),
                   ],
@@ -978,12 +1067,10 @@ class _ExceptionCardState extends State<_ExceptionCard> {
           if (_expanded)
             Container(
               decoration: BoxDecoration(
-                border: Border(
-                    top: BorderSide(
-                        color: color.withOpacity(0.2))),
+                border: Border(top: BorderSide(color: color.withOpacity(0.2))),
                 color: AppColors.bg.withOpacity(0.5),
-                borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(14)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(14)),
               ),
               padding: const EdgeInsets.all(14),
               child: Column(
@@ -998,11 +1085,9 @@ class _ExceptionCardState extends State<_ExceptionCard> {
                     runSpacing: 6,
                     children: ExceptionType.values
                         .where((t) =>
-                            t != ExceptionType.none &&
-                            t != s.exceptionType)
+                            t != ExceptionType.none && t != s.exceptionType)
                         .map((t) => GestureDetector(
-                              onTap: () =>
-                                  widget.onMarkException(t),
+                              onTap: () => widget.onMarkException(t),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 5),
@@ -1010,15 +1095,13 @@ class _ExceptionCardState extends State<_ExceptionCard> {
                                   color: _exTypeColor(t).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                      color: _exTypeColor(t)
-                                          .withOpacity(0.3)),
+                                      color: _exTypeColor(t).withOpacity(0.3)),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(_exTypeIcon(t),
-                                        color: _exTypeColor(t),
-                                        size: 12),
+                                        color: _exTypeColor(t), size: 12),
                                     const SizedBox(width: 5),
                                     Text(t.label,
                                         style: TextStyle(
@@ -1088,11 +1171,9 @@ class _InfoTile extends StatelessWidget {
         Icon(icon, size: 14, color: AppColors.textMuted),
         const SizedBox(width: 6),
         Text('$label: ',
-            style: const TextStyle(
-                color: AppColors.textMuted, fontSize: 12)),
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
         Text(value,
-            style: const TextStyle(
-                color: AppColors.textPrimary, fontSize: 12)),
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 12)),
       ],
     );
   }
@@ -1117,8 +1198,7 @@ class _ActionChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
           color: selected ? color.withOpacity(0.18) : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(8),
@@ -1130,8 +1210,7 @@ class _ActionChip extends StatelessWidget {
           style: TextStyle(
               color: selected ? color : AppColors.textSecondary,
               fontSize: 12,
-              fontWeight:
-                  selected ? FontWeight.w600 : FontWeight.normal),
+              fontWeight: selected ? FontWeight.w600 : FontWeight.normal),
         ),
       ),
     );
