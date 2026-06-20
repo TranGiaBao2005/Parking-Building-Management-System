@@ -1,0 +1,10 @@
+// Models
+export 'package:parking_management/core/models/parking_slot.dart';
+export 'package:parking_management/core/models/parking_floor.dart';
+export 'package:parking_management/core/models/parking_session.dart';
+export 'package:parking_management/core/models/pricing_policy.dart';
+export 'package:parking_management/core/models/app_user.dart';
+export 'package:parking_management/core/models/vehicle.dart';
+export 'package:parking_management/core/models/feedback_report.dart';
+export 'package:parking_management/core/models/prebooking.dart';
+export 'package:parking_management/core/models/ai_recommendation.dart';
