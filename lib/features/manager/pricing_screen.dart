@@ -30,10 +30,11 @@ class _PricingScreenState extends State<PricingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
+            Align(
+              alignment: isMobile ? Alignment.center : Alignment.centerLeft,
               child: Text(
                 'Chính sách giá',
-                textAlign: TextAlign.center,
+                textAlign: isMobile ? TextAlign.center : TextAlign.left,
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       fontSize: isMobile ? 22 : null,
                     ),

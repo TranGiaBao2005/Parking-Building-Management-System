@@ -27,70 +27,9 @@ class ManagerDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Wrap(
-              alignment:
-                  isMobile ? WrapAlignment.center : WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              runSpacing: 12,
-              children: [
-                SizedBox(
-                  width: isMobile ? double.infinity : null,
-                  child: Column(
-                    crossAxisAlignment: isMobile
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Tổng quan hệ thống',
-                        textAlign: TextAlign.center,
-                        style:
-                            Theme.of(context).textTheme.displayMedium?.copyWith(
-                                  fontSize: isMobile ? 22 : null,
-                                ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        DateFormat('EEEE, d MMMM yyyy', 'vi')
-                            .format(DateTime.now()),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.available.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border:
-                        Border.all(color: AppColors.available.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.available,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${svc.buildingName} – Đang hoạt động',
-                        style: const TextStyle(
-                            color: AppColors.available,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ).animate().fadeIn(delay: 100.ms),
+            _DashboardHeader(svc: svc, isMobile: isMobile)
+                .animate()
+                .fadeIn(delay: 100.ms),
             const SizedBox(height: 28),
 
             // Stat cards
@@ -128,6 +67,82 @@ class ManagerDashboardScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DashboardHeader extends StatelessWidget {
+  final MockDataService svc;
+  final bool isMobile;
+
+  const _DashboardHeader({required this.svc, required this.isMobile});
+
+  @override
+  Widget build(BuildContext context) {
+    final title = Column(
+      crossAxisAlignment:
+          isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Tổng quan hệ thống',
+          textAlign: isMobile ? TextAlign.center : TextAlign.left,
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                fontSize: isMobile ? 22 : null,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          DateFormat('EEEE, d MMMM yyyy', 'vi').format(DateTime.now()),
+          textAlign: isMobile ? TextAlign.center : TextAlign.left,
+          style: const TextStyle(color: AppColors.textSecondary),
+        ),
+      ],
+    );
+
+    final status = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.available.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.available.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: const BoxDecoration(
+              color: AppColors.available,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${svc.buildingName} – Đang hoạt động',
+            style: const TextStyle(
+              color: AppColors.available,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [title, const SizedBox(height: 12), status],
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(child: title),
+        const SizedBox(width: 16),
+        status,
+      ],
     );
   }
 }

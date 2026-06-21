@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../core/models/models.dart';
 import '../../shared/utils/responsive.dart';
+import '../../shared/widgets/camera_plate_scanner.dart';
 
 class CheckOutScreen extends StatefulWidget {
   const CheckOutScreen({super.key});
@@ -40,10 +41,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
+                  Align(
+                    alignment:
+                        isMobile ? Alignment.center : Alignment.centerLeft,
                     child: Text(
                       'Xe ra (Check-out)',
-                      textAlign: TextAlign.center,
+                      textAlign: isMobile ? TextAlign.center : TextAlign.left,
                       style: Theme.of(context)
                           .textTheme
                           .displayMedium
@@ -55,7 +58,18 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           style: TextStyle(color: AppColors.textSecondary))
                       .animate()
                       .fadeIn(delay: 100.ms),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
+
+                  CameraPlateScanner(
+                    samplePlate: svc.activeSessions.isNotEmpty
+                        ? svc.activeSessions.first.licensePlate
+                        : '51A-78901',
+                    onDetected: (plate) {
+                      _searchCtrl.text = plate;
+                      _search(svc);
+                    },
+                  ),
+                  const SizedBox(height: 24),
 
                   // Search box
                   Row(

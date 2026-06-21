@@ -78,6 +78,576 @@ Mục đích:
 
 ## Log History
 
+## [2026-06-21 14:05:00] - Thu gọn badge trạng thái tài khoản
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | UI adjustment / Table status badge / Verification                                                                   |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Chỉnh trạng thái trong bảng tài khoản thành “Vô hiệu hóa” và “Hoạt động”, kích thước vừa đủ nội dung.
+
+### AI Assistance Summary
+
+- Đổi nhãn trạng thái không hoạt động từ “Vô hiệu” thành “Vô hiệu hóa”.
+- Bọc badge trong `Align` để badge ôm vừa nội dung thay vì kéo giãn hết cột.
+- Điều chỉnh padding, bo góc và cỡ chữ để hai trạng thái hiển thị gọn trên một dòng.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/admin/user_management_screen.dart` | Modified | Thu gọn badge Hoạt động/Vô hiệu hóa. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format lib/features/admin/user_management_screen.dart` | Passed; file đã đúng định dạng. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; toàn worktree có 16 file tracked đã sửa và 1 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan.
+- Định dạng và kiểm tra khoảng trắng đạt.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Toàn worktree có 16 file tracked đã sửa và một widget camera mới chưa được track. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần kiểm tra hai badge trạng thái trên Web và mobile.
+- Chạy `flutter analyze` và `flutter test` trước khi commit.
+
+---
+
+## [2026-06-21 13:46:12] - Phân trang bảng tài khoản và thêm dữ liệu test
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Table layout / Pagination / Mock data / Verification                                                                |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Quản lý người dùng: giãn đều table, thêm phân trang bên dưới; mỗi trang chỉ hiện 10 tài khoản và thêm nhiều tài khoản để test trang 2.
+
+### AI Assistance Summary
+
+- Chia đều chiều rộng năm cột Họ tên, Username, Role, Trạng thái và Thao tác.
+- Thêm phân trang dưới table với nút trước/sau, số trang và thông tin khoảng tài khoản đang hiển thị.
+- Giới hạn tối đa 10 tài khoản mỗi trang; tìm kiếm và lọc role được thực hiện trước khi phân trang và tự quay về trang 1.
+- Thêm 24 tài khoản mock, nâng tổng dữ liệu ban đầu lên 30 tài khoản để kiểm tra đủ ba trang.
+- Pagination responsive: mobile có thể cuộn ngang dãy nút trang.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/admin/user_management_screen.dart` | Modified | Giãn đều cột và thêm phân trang 10 tài khoản/trang. |
+| `lib/core/services/mock_data_service.dart` | Modified | Thêm 24 tài khoản mẫu để test. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format <2 relevant Dart files>` | Passed; 2 file được định dạng. |
+| `dart analyze <2 relevant Dart files>` | Chỉ báo lỗi do sandbox không đọc được package Pub bên ngoài và cảnh báo deprecated; không phát hiện lỗi cấu trúc độc lập. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; toàn worktree có 16 file tracked đã sửa và 1 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan.
+- Định dạng và kiểm tra khoảng trắng đạt.
+- Static analysis bị giới hạn bởi quyền đọc dependency ngoài workspace.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Toàn worktree có 16 file tracked đã sửa và một widget camera mới chưa được track. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần mở Admin, chuyển giữa trang 1–3 và kiểm tra mỗi trang tối đa 10 dòng.
+- Thử tìm kiếm/lọc role để xác nhận pagination quay về trang đầu và cập nhật tổng số.
+- Chạy `flutter analyze` và `flutter test` trong môi trường local trước khi commit.
+
+---
+
+## [2026-06-21 13:20:02] - Thêm action Chi tiết, Edit và Delete cho tài khoản Admin
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | UI feature / CRUD mock service / Dialog / Security / Verification                                                   |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Admin – Quản lý người dùng: thêm cột action gồm Delete, Edit, Chi tiết; Dialog chi tiết chứa thông tin user gồm số điện thoại, mật khẩu, v.v.; không hiện email và ngày tạo trong table mà chuyển vào chi tiết.
+
+### AI Assistance Summary
+
+- Rút gọn table còn Họ tên, Username, Role, Trạng thái và Thao tác; email/ngày tạo được chuyển khỏi table.
+- Thêm ba action bằng icon: xem Chi tiết, Chỉnh sửa và Xóa.
+- Dialog Chi tiết hiển thị ID, họ tên, username, email, số điện thoại, role, trạng thái, ngày tạo và mật khẩu dạng che.
+- Dialog Chỉnh sửa cho phép cập nhật thông tin, role và trạng thái tài khoản.
+- Dialog xác nhận trước khi xóa; ngăn xóa chính tài khoản đang đăng nhập.
+- Bổ sung hàm cập nhật và xóa user trong mock service. Không lưu hoặc hiển thị mật khẩu thật để tuân thủ bảo mật.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/admin/user_management_screen.dart` | Modified | Thêm action, dialog chi tiết/sửa/xóa và rút gọn table. |
+| `lib/core/services/mock_data_service.dart` | Modified | Thêm cập nhật và xóa tài khoản mock. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format <2 relevant Dart files>` | Passed; 2 file được định dạng. |
+| `dart analyze <2 relevant Dart files>` | Chỉ báo lỗi do sandbox không đọc được package Pub bên ngoài và các cảnh báo deprecated có sẵn; không phát hiện lỗi cấu trúc độc lập. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; toàn worktree có 16 file tracked đã sửa và 1 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan.
+- Định dạng và kiểm tra khoảng trắng đạt.
+- Static analysis bị giới hạn bởi quyền đọc dependency ngoài workspace.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Toàn worktree có 16 file tracked đã sửa và một widget camera mới chưa được track. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần thử cả ba action trên Web/mobile và xác nhận table không còn email/ngày tạo.
+- Kiểm tra không thể xóa tài khoản đang đăng nhập và dữ liệu chỉnh sửa cập nhật đúng.
+- Mật khẩu thật không được lưu/hiển thị; Dialog chỉ dùng ký tự che bảo mật.
+- Chạy `flutter analyze` và `flutter test` trong môi trường local trước khi commit.
+
+---
+
+## [2026-06-21 11:07:00] - Fix lỗi Layout bảng quản lý tài khoản Admin
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | Gemini 3.1 Pro (High) / Antigravity AI                                                                               |
+| Support Type               | Fix bug / Layout fix                                                                                                 |
+| Estimated AI Support       | 90% AI suggestion, 10% developer review                                                                              |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer reviewed, tested, and accepted responsibility for the final code. |
+
+### User Prompt
+
+xem bị lỗi gì sao ko hiện table tài khoản của admin
+
+### AI Assistance Summary
+
+- AI đã đọc file `lib/features/admin/user_management_screen.dart` và phát hiện nguyên nhân gây lỗi `Cannot hit test a render box that has never been laid out` làm màn hình Admin bị trắng/không hiển thị bảng tài khoản.
+- Nguyên nhân là do widget `Flex` theo chiều ngang (khi không ở giao diện mobile) được cấu hình `crossAxisAlignment: CrossAxisAlignment.stretch` bên trong một `SingleChildScrollView` cuộn dọc, dẫn đến việc layout đòi hỏi chiều cao vô cực gây ra lỗi crash RenderBox.
+- Đã sửa lại thuộc tính `crossAxisAlignment` thành `CrossAxisAlignment.center` khi không ở thiết bị di động.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/admin/user_management_screen.dart` | Modified | Sửa lỗi `crossAxisAlignment: stretch` của Flex ngang gây crash layout. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`, 15 files changed, 1 untracked. |
+
+### Git Status Summary
+
+Có tổng cộng 15 file tracked đã thay đổi, 1 file mới `camera_plate_scanner.dart` chưa theo dõi. Không commit.
+
+### Developer Review Notes
+
+- Cần chạy lại ứng dụng hoặc nhấn "r" (hot reload) / "R" (hot restart) trên terminal để thấy kết quả. Bảng tài khoản Admin sẽ hiển thị bình thường.
+- Chạy `flutter analyze` trước khi gộp code.
+
+---
+
+## [2026-06-21 11:00:02] - Chuẩn hóa màn Quản lý tài khoản Admin
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Responsive UI / Account form / Account table / Verification                                                         |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Admin – Quản lý tài khoản: có table tài khoản, role và thêm form tạo tài khoản.
+
+### AI Assistance Summary
+
+- Đổi tiêu đề màn hình thành “Quản lý tài khoản”.
+- Hiển thị form tạo tài khoản trực tiếp trên cả Web và mobile.
+- Làm form responsive: Web hiển thị nhiều cột; mobile xếp một cột để không co chữ hoặc tràn ngang.
+- Ghi rõ trường chọn `Role / Vai trò` trong form và cột `Role / Vai trò` trong bảng.
+- Đổi tên khu vực bảng thành “Bảng tài khoản và Role” và bỏ form hộp thoại cũ bị trùng chức năng.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/admin/user_management_screen.dart` | Modified | Chuẩn hóa form và bảng quản lý tài khoản/role responsive. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format lib/features/admin/user_management_screen.dart` | Passed; file được định dạng. |
+| `dart analyze lib/features/admin/user_management_screen.dart` | Không phát hiện lỗi cấu trúc độc lập; dependency Pub ngoài workspace vẫn bị giới hạn bởi sandbox. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; toàn worktree có 15 file tracked đã sửa và 1 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan.
+- Định dạng và kiểm tra khoảng trắng đạt.
+- Static analysis bị giới hạn bởi quyền đọc dependency ngoài workspace.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Toàn worktree có 15 file tracked đã sửa và một widget camera mới chưa được track. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần thử tạo tài khoản với từng role và xác nhận dòng mới xuất hiện trong bảng.
+- Kiểm tra form một cột trên mobile và bảng cuộn ngang.
+- Chạy `flutter analyze` và `flutter test` trong môi trường local trước khi commit.
+
+---
+
+## [2026-06-21 10:45:37] - Cố định hiển thị bảng và form tài khoản Admin
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | UI bug fix / Form layout / Table layout / Verification                                                              |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Admin: sửa bảng tài khoản hiện lên và thêm form bảng/tạo tài khoản.
+
+### AI Assistance Summary
+
+- Chuyển toàn trang Quản lý người dùng sang cuộn dọc để nội dung phía trên không làm bảng bị co mất chiều cao.
+- Cấp chiều cao cố định cho vùng bảng tài khoản, giữ thanh cuộn ngang luôn hiển thị để xem đủ các cột.
+- Hiển thị sẵn form tạo tài khoản trên Web thay vì phải bấm mở.
+- Sau khi tạo tài khoản, form tự xóa dữ liệu và trở về vai trò Staff để có thể nhập tài khoản tiếp theo.
+- Mobile tiếp tục dùng hộp thoại tạo tài khoản nhằm tránh form dài che bảng.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/admin/user_management_screen.dart` | Modified | Cố định chiều cao bảng, bật cuộn trang và hiển thị sẵn form Web. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format lib/features/admin/user_management_screen.dart` | Passed; file đã đúng định dạng. |
+| `dart analyze lib/features/admin/user_management_screen.dart` | Không phát hiện lỗi cấu trúc độc lập; dependency Pub ngoài workspace vẫn không đọc được trong sandbox. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; toàn worktree có 15 file tracked đã sửa và 1 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan trên trình duyệt.
+- Định dạng và kiểm tra khoảng trắng đạt.
+- Static analysis bị giới hạn bởi quyền đọc dependency ngoài workspace.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Toàn worktree có 15 file tracked đã sửa và một widget camera mới chưa được track. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần mở màn Admin trên Web để xác nhận form luôn hiển thị và bảng có chiều cao/khả năng cuộn phù hợp.
+- Thử tạo tài khoản và kiểm tra dòng mới xuất hiện trong bảng.
+- Chạy `flutter analyze` và `flutter test` trong môi trường local trước khi commit.
+
+---
+
+## [2026-06-21 10:40:03] - Căn badge Staff và bổ sung form tạo tài khoản Admin
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Responsive UI fix / Form implementation / Table visibility / Verification                                           |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Staff: đưa ô số trường hợp sang bên phải cùng. Admin: sửa bảng tài khoản hiện lên và thêm form tạo tài khoản.
+
+### AI Assistance Summary
+
+- Thay header Ngoại lệ của Staff bằng bố cục desktop dùng `Expanded`, đảm bảo badge số trường hợp nằm sát mép phải; mobile vẫn xếp dọc và căn giữa.
+- Gắn controller và thanh cuộn ngang luôn hiển thị cho bảng tài khoản Admin để người dùng nhận biết và xem được toàn bộ cột.
+- Thêm form tạo tài khoản trực tiếp trên trang Admin cho Web, gồm họ tên, username, email, số điện thoại và vai trò.
+- Trên mobile, nút “Tạo tài khoản” tiếp tục mở form dạng hộp thoại để tránh làm mất không gian của bảng.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/staff/exception_screen.dart` | Modified | Đưa badge số trường hợp sang mép phải trên desktop. |
+| `lib/features/admin/user_management_screen.dart` | Modified | Hiển thị thanh cuộn bảng và thêm form tạo tài khoản responsive. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format <2 relevant Dart files>` | Passed; 2 files formatted. |
+| `dart analyze <2 relevant Dart files>` | Không phát hiện lỗi cấu trúc độc lập; dependency bên ngoài Pub cache vẫn không đọc được trong sandbox. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; toàn worktree hiện có 15 file tracked đã sửa và 1 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan.
+- Định dạng và kiểm tra khoảng trắng đạt.
+- Static analysis bị giới hạn bởi quyền đọc dependency ngoài workspace.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Toàn worktree hiện có 15 file tracked đã sửa và một widget camera mới chưa được track. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần kiểm tra badge Staff ở Web và thử tạo tài khoản bằng cả form Web lẫn hộp thoại mobile.
+- Cần kiểm tra bảng có cuộn ngang và tài khoản mới xuất hiện ngay sau khi tạo.
+- Chạy `flutter analyze` và `flutter test` trong môi trường local bình thường trước khi commit.
+
+---
+
+## [2026-06-21 10:34:20] - Căn chỉnh chính xác bốn khu vực Parking Manager
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Responsive UI fix / Layout adjustment / Verification                                                                |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Chỉnh Parking Manager: đưa “Bãi đỗ xe SWP08 – Đang hoạt động” và số trường hợp ngoại lệ sang phải; đặt chú giải màu trên dãy slot xe; đưa các ô “Xe vào hôm nay”, “Xe ra hôm nay” sang trái.
+
+### AI Assistance Summary
+
+- Thay header Tổng quan trên desktop bằng hàng có vùng tiêu đề giãn hết chiều rộng, đảm bảo trạng thái bãi đỗ bám mép phải.
+- Di chuyển chú giải màu khỏi header/hàng tầng và đặt ngay phía trên lưới slot xe.
+- Đặt `crossAxisAlignment` của các tab báo cáo về bên trái để các thẻ thống kê bắt đầu từ mép trái.
+- Kiểm tra header Ngoại lệ: cấu trúc desktop đã dùng `Expanded` cho tiêu đề và badge cuối hàng nên số trường hợp nằm bên phải; không cần sửa thêm.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/manager/dashboard_screen.dart` | Modified | Ép badge trạng thái bãi đỗ sang mép phải trên desktop. |
+| `lib/features/manager/slot_management_screen.dart` | Modified | Đặt chú giải màu ngay trên lưới slot. |
+| `lib/features/manager/reports_screen.dart` | Modified | Căn trái các thẻ thống kê báo cáo. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format <4 manager files>` | Passed; 4 files formatted. |
+| `dart analyze <4 manager files>` | Không phát hiện lỗi cấu trúc độc lập; việc phân tích package vẫn bị giới hạn do sandbox không đọc được Pub cache ngoài workspace. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; toàn worktree hiện có 14 file tracked đã sửa và 1 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan trong trình duyệt.
+- Định dạng và kiểm tra khoảng trắng đạt.
+- Static analysis bị giới hạn bởi quyền đọc dependency bên ngoài workspace.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Toàn bộ worktree hiện có 14 file tracked đã sửa và một widget camera mới chưa được track. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần mở giao diện Web Manager để xác nhận badge nằm sát phải và chú giải nằm ngay trên lưới slot ở kích thước màn hình thực tế.
+- Cần chạy `flutter analyze` và `flutter test` trong môi trường local bình thường trước khi commit.
+
+---
+
+## [2026-06-21 10:23:40] - Hoàn thiện bố cục Web Manager, camera Staff và bảng tài khoản Admin
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Fix bug / Responsive UI / Frontend camera prototype / Verification                                                   |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Parking Manager: đưa trạng thái bãi đỗ và số ngoại lệ sang phải, chuyển chú giải slot xuống hàng tầng/slot, căn các ô báo cáo sang trái. Staff: màn hình quét camera luôn mở, không cần bấm nút, đưa số trường hợp sang phải. Admin: sửa bảng tài khoản hiển thị và thêm phần bảng/form tài khoản.
+
+### AI Assistance Summary
+
+- Sửa nhận diện breakpoint Web để cửa sổ web thấp không còn bị nhận nhầm là giao diện mobile.
+- Chuyển chú giải trạng thái slot xuống cùng hàng chọn tầng trên desktop; căn các thẻ báo cáo từ mép trái và mở rộng bảng báo cáo.
+- Thêm khung camera quét biển số luôn hiển thị và tự động nhận diện cho màn Xe vào/Xe ra; đây là camera mô phỏng của frontend prototype.
+- Khôi phục bảng quản lý tài khoản với chiều rộng tối thiểu, thanh cuộn ngang và tiêu đề “Bảng tài khoản”; giữ form “Thêm tài khoản”.
+- Giữ tiêu đề căn trái trên Web và căn giữa trên mobile ở các màn hình liên quan.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/shared/utils/responsive.dart` | Modified | Phân biệt breakpoint Web theo chiều rộng viewport. |
+| `lib/shared/widgets/camera_plate_scanner.dart` | Created | Camera prototype luôn mở và tự quét biển số. |
+| `lib/features/staff/check_in_screen.dart` | Modified | Tích hợp camera tự quét cho Xe vào. |
+| `lib/features/staff/check_out_screen.dart` | Modified | Tích hợp camera tự quét cho Xe ra. |
+| `lib/features/manager/slot_management_screen.dart` | Modified | Chuyển chú giải màu xuống hàng chọn tầng trên Web. |
+| `lib/features/manager/reports_screen.dart` | Modified | Căn trái thẻ thống kê, thu gọn thẻ và mở rộng bảng. |
+| `lib/features/manager/exception_management_screen.dart` | Modified | Căn tiêu đề/badge ngoại lệ theo desktop và mobile. |
+| `lib/features/manager/pricing_screen.dart` | Modified | Căn tiêu đề trái trên Web, giữa trên mobile. |
+| `lib/features/admin/user_management_screen.dart` | Modified | Khôi phục bảng tài khoản, thêm nhãn bảng và cuộn ngang. |
+| `lib/features/admin/system_config_screen.dart` | Modified | Căn tiêu đề responsive. |
+| `lib/features/driver/feedback_screen.dart` | Modified | Căn tiêu đề responsive. |
+| `lib/features/driver/my_sessions_screen.dart` | Modified | Căn tiêu đề responsive. |
+| `lib/features/driver/prebooking_screen.dart` | Modified | Căn tiêu đề responsive. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI này. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format <13 relevant Dart files>` | Passed; 13 files formatted, no additional formatting changes. |
+| `dart analyze <8 relevant Dart files>` | Environment could not read packages from the external Pub cache; only dependency-derived errors and existing deprecation notices were reported, no independent structural error identified. |
+| `git diff --check` | Passed; no whitespace error. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; 13 tracked files modified and 1 new camera widget file; no commit made. |
+
+### Test / Build Result
+
+- Full Flutter build and runtime camera test were not run in this environment.
+- Formatting and whitespace verification passed.
+- Static analysis was limited because the sandbox could not read external Pub package files.
+
+### Git Status Summary
+
+Branch `frontend` tracks `origin/frontend`. There are 13 modified tracked files and one untracked new widget file. No commit, push, reset, delete, or other destructive Git action was performed.
+
+### Developer Review Notes
+
+- Developer should run the app on Web and mobile to confirm final alignment and horizontal scrolling.
+- The current scanner is a frontend simulation; a real device camera requires a camera plugin, platform permissions, and OCR integration.
+- Developer must review the code and run `flutter analyze`/`flutter test` in the normal local environment before committing.
+
+---
+
+## [2026-06-21 09:54:37] - Khôi phục layout Web và thêm camera quét biển số cho Staff
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Fix bug / Responsive UI / Refactor / Frontend camera prototype / Verification                                       |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+> Vì đã chỉnh giao diện bên mobile nên lỗi bên web: đưa trạng thái bãi và số trường hợp ngoại lệ sang phải, đưa chú giải slot xuống dưới, thu nhỏ các ô báo cáo và phóng to bảng, thêm màn quét camera cho xe vào/xe ra, khôi phục bảng Admin, và để tiêu đề bên trái trên web nhưng giữa trên mobile.
+
+### AI Assistance Summary
+
+- Sửa nhận diện responsive: Flutter Web dùng chiều rộng viewport, tránh cửa sổ web thấp bị nhận nhầm thành mobile.
+- Giữ tiêu đề căn trái trên desktop/web và căn giữa trên mobile ở các màn liên quan.
+- Đưa chú giải màu của Quản lý Slot xuống dưới header trên desktop.
+- Ép badge ngoại lệ về mép phải ở desktop và giữ bố cục giữa trên mobile.
+- Chuyển các thẻ tóm tắt báo cáo thành một hàng nhỏ có thể cuộn ngang và cho bảng báo cáo mở rộng hết chiều ngang khả dụng.
+- Đặt chiều rộng tối thiểu cho bảng Quản lý người dùng để bảng hiển thị và cuộn ngang trên web/mobile.
+- Thêm component camera mô phỏng dùng chung cho Staff Check-in và Check-out; kết quả quét tự điền/tìm biển số.
+- Kiểm tra lại dashboard Manager và badge Staff; bố cục hiện tại đã đáp ứng vị trí bên phải trên desktop sau khi sửa breakpoint web.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| --- | --- | --- |
+| `lib/shared/widgets/camera_plate_scanner.dart` | Created | Màn quét camera mô phỏng và trả biển số về form |
+| `lib/shared/utils/responsive.dart` | Modified | Phân biệt breakpoint Web theo viewport width |
+| `lib/features/manager/slot_management_screen.dart` | Modified | Đưa chú giải trạng thái xuống dưới header desktop |
+| `lib/features/manager/reports_screen.dart` | Modified | Thẻ thống kê một hàng nhỏ, bảng rộng và tiêu đề adaptive |
+| `lib/features/manager/exception_management_screen.dart` | Modified | Header desktop dùng Row để đẩy badge sang mép phải |
+| `lib/features/manager/pricing_screen.dart` | Modified | Tiêu đề trái trên web, giữa trên mobile |
+| `lib/features/driver/my_sessions_screen.dart` | Modified | Tiêu đề adaptive theo desktop/mobile |
+| `lib/features/driver/prebooking_screen.dart` | Modified | Tiêu đề adaptive theo desktop/mobile |
+| `lib/features/driver/feedback_screen.dart` | Modified | Tiêu đề adaptive theo desktop/mobile |
+| `lib/features/staff/check_in_screen.dart` | Modified | Thêm camera scan và giữ tiêu đề adaptive |
+| `lib/features/staff/check_out_screen.dart` | Modified | Thêm camera scan, tự tìm session theo biển số |
+| `lib/features/admin/system_config_screen.dart` | Modified | Tiêu đề adaptive và giữ bảng responsive |
+| `lib/features/admin/user_management_screen.dart` | Modified | Bảng có chiều rộng tối thiểu 1050px và cuộn ngang |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi log phiên AI coding hiện tại |
+
+### Commands Run & Results
+
+| Command | Result |
+| --- | --- |
+| Đọc `AGENTS.md` và khảo sát file bằng `rg`/PowerShell | Success |
+| `dart format <modified files>` | Success; các file parse và format thành công |
+| `dart analyze <targeted files>` | Targeted structural check completed; không phát hiện lỗi cấu trúc mới sau khi lọc lỗi package-cache của môi trường |
+| `flutter test` | Not run; test scaffold cũ vẫn cần Developer cập nhật |
+| `flutter build` | Not run |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; source files đã sửa và camera scanner mới, chưa commit |
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Sau khi ghi log có 13 file modified và 1 file mới; chưa stage, commit hoặc push.
+
+### Developer Review Notes
+
+- Chạy lại Flutter Web ở nhiều chiều rộng để xác nhận header/badge và bảng Admin đúng vị trí.
+- Camera hiện là mô phỏng frontend. Muốn dùng camera thật cần package camera, quyền thiết bị và xử lý nhận diện biển số riêng.
+- Kiểm tra thao tác cuộn ngang bằng chuột/touchpad ở bảng báo cáo và bảng người dùng.
+- AI chưa commit hoặc push; Developer chịu trách nhiệm review và kiểm thử cuối cùng.
+
+---
+
 ## [2026-06-20 20:21:57] - Phân tích project và hoàn thiện giao diện responsive mobile
 
 | Field                      | Content                                                                                                              |

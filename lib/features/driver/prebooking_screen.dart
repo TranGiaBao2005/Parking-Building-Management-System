@@ -45,10 +45,11 @@ class _PrebookingScreenState extends State<PrebookingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
+                Align(
+                  alignment: isMobile ? Alignment.center : Alignment.centerLeft,
                   child: Text(
                     'Đặt chỗ trước',
-                    textAlign: TextAlign.center,
+                    textAlign: isMobile ? TextAlign.center : TextAlign.left,
                     style: Theme.of(context)
                         .textTheme
                         .displayMedium

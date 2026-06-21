@@ -41,10 +41,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
+                Align(
+                  alignment: isMobile ? Alignment.center : Alignment.centerLeft,
                   child: Text(
                     'Gửi phản hồi',
-                    textAlign: TextAlign.center,
+                    textAlign: isMobile ? TextAlign.center : TextAlign.left,
                     style: Theme.of(context)
                         .textTheme
                         .displayMedium

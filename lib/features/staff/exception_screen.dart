@@ -30,55 +30,9 @@ class _ExceptionScreenState extends State<ExceptionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                SizedBox(
-                  width:
-                      isMobile ? MediaQuery.sizeOf(context).width - 32 : null,
-                  child: Column(
-                    crossAxisAlignment: isMobile
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Xử lý Ngoại lệ',
-                        textAlign: TextAlign.center,
-                        style:
-                            Theme.of(context).textTheme.displayMedium?.copyWith(
-                                  fontSize: isMobile ? 22 : null,
-                                ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Giải quyết mất thẻ, sai biển số, xe quá giờ...',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.reserved.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border:
-                        Border.all(color: AppColors.reserved.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    '${exceptions.length} trường hợp cần xử lý',
-                    style: const TextStyle(
-                        color: AppColors.reserved,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ),
-              ],
+            _StaffExceptionHeader(
+              count: exceptions.length,
+              isMobile: isMobile,
             ).animate().fadeIn(),
             const SizedBox(height: 28),
 
@@ -220,6 +174,70 @@ class _ExceptionScreenState extends State<ExceptionScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StaffExceptionHeader extends StatelessWidget {
+  final int count;
+  final bool isMobile;
+
+  const _StaffExceptionHeader({required this.count, required this.isMobile});
+
+  @override
+  Widget build(BuildContext context) {
+    final title = Column(
+      crossAxisAlignment:
+          isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Xử lý Ngoại lệ',
+          textAlign: isMobile ? TextAlign.center : TextAlign.left,
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                fontSize: isMobile ? 22 : null,
+              ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Giải quyết mất thẻ, sai biển số, xe quá giờ...',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+      ],
+    );
+
+    final badge = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.reserved.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.reserved.withOpacity(0.3)),
+      ),
+      child: Text(
+        '$count trường hợp cần xử lý',
+        style: const TextStyle(
+          color: AppColors.reserved,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+
+    if (isMobile) {
+      return SizedBox(
+        width: double.infinity,
+        child: Column(
+          children: [title, const SizedBox(height: 12), badge],
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(child: title),
+        const SizedBox(width: 16),
+        badge,
+      ],
     );
   }
 }

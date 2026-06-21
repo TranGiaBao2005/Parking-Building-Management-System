@@ -162,26 +162,23 @@ class _ExceptionManagementScreenState extends State<ExceptionManagementScreen> {
         ),
       );
     }
-    return Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 12,
-      runSpacing: 12,
+    return Row(
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Quản lý Ngoại lệ',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      fontSize: isMobile ? 22 : null,
-                    )),
-            const SizedBox(height: 4),
-            const Text(
-              'Theo dõi & xử lý mất vé, sai biển số, quá giờ, sai khu vực, chưa thanh toán',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Quản lý Ngoại lệ',
+                  style: Theme.of(context).textTheme.displayMedium),
+              const SizedBox(height: 4),
+              const Text(
+                'Theo dõi & xử lý mất vé, sai biển số, quá giờ, sai khu vực, chưa thanh toán',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(width: 16),
         if (activeCount > 0) _buildActiveBadge(activeCount),
       ],
     );

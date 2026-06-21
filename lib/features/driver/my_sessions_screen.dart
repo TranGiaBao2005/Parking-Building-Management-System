@@ -52,10 +52,11 @@ class _MySessionsScreenState extends State<MySessionsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
+            Align(
+              alignment: isMobile ? Alignment.center : Alignment.centerLeft,
               child: Text(
                 'Lượt gửi xe của tôi',
-                textAlign: TextAlign.center,
+                textAlign: isMobile ? TextAlign.center : TextAlign.left,
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       fontSize: isMobile ? 22 : null,
                     ),

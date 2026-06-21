@@ -38,10 +38,11 @@ class _ReportsScreenState extends State<ReportsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
+            Align(
+              alignment: isMobile ? Alignment.center : Alignment.centerLeft,
               child: Text(
                 'Báo cáo & Thống kê',
-                textAlign: TextAlign.center,
+                textAlign: isMobile ? TextAlign.center : TextAlign.left,
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       fontSize: isMobile ? 22 : null,
                     ),
@@ -104,17 +105,21 @@ class _VehicleLogTab extends StatelessWidget {
         .length;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Summary row
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            _MiniStat('Xe vào hôm nay', '$todayIn lượt', AppColors.primary),
-            _MiniStat('Xe ra hôm nay', '$todayOut lượt', AppColors.available),
-            _MiniStat('Đang gửi', '${svc.activeSessions.length} xe',
-                AppColors.reserved),
-          ],
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _MiniStat('Xe vào hôm nay', '$todayIn lượt', AppColors.primary),
+              const SizedBox(width: 10),
+              _MiniStat('Xe ra hôm nay', '$todayOut lượt', AppColors.available),
+              const SizedBox(width: 10),
+              _MiniStat('Đang gửi', '${svc.activeSessions.length} xe',
+                  AppColors.reserved),
+            ],
+          ),
         ).animate().fadeIn(),
         const SizedBox(height: 20),
         Expanded(
@@ -173,16 +178,19 @@ class _RevenueTab extends StatelessWidget {
     final todayTotal = svc.todayRevenue();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            _MiniStat('Doanh thu hôm nay', '${fmt.format(todayTotal)}đ',
-                AppColors.available),
-            _MiniStat('Doanh thu 7 ngày', '${fmt.format(weekTotal)}đ',
-                AppColors.primary),
-          ],
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _MiniStat('Doanh thu hôm nay', '${fmt.format(todayTotal)}đ',
+                  AppColors.available),
+              const SizedBox(width: 10),
+              _MiniStat('Doanh thu 7 ngày', '${fmt.format(weekTotal)}đ',
+                  AppColors.primary),
+            ],
+          ),
         ).animate().fadeIn(),
         const SizedBox(height: 20),
         Expanded(
@@ -269,7 +277,7 @@ class _MiniStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(10),
@@ -304,73 +312,79 @@ class _DataTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(
-            width: (headers.length * 130).toDouble(),
-            child: SingleChildScrollView(
-              child: Table(
-                border: TableBorder(
-                  horizontalInside:
-                      const BorderSide(color: AppColors.border, width: 1),
-                  bottom: const BorderSide(color: AppColors.border),
-                ),
-                columnWidths: const {0: FixedColumnWidth(130)},
-                children: [
-                  // Header
-                  TableRow(
-                    decoration:
-                        const BoxDecoration(color: AppColors.surfaceLight),
-                    children: headers
-                        .map((h) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 12),
-                              child: Text(h,
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  )),
-                            ))
-                        .toList(),
+    return LayoutBuilder(builder: (context, constraints) {
+      final minimumWidth = headers.length * 145.0;
+      final tableWidth = constraints.maxWidth > minimumWidth
+          ? constraints.maxWidth
+          : minimumWidth;
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: tableWidth,
+              child: SingleChildScrollView(
+                child: Table(
+                  border: TableBorder(
+                    horizontalInside:
+                        const BorderSide(color: AppColors.border, width: 1),
+                    bottom: const BorderSide(color: AppColors.border),
                   ),
-                  // Data rows
-                  ...rows.asMap().entries.map((entry) {
-                    final i = entry.key;
-                    final row = entry.value;
-                    return TableRow(
-                      children: row.asMap().entries.map((cell) {
-                        final isLast = cell.key == row.length - 1;
-                        final color = isLast &&
-                                statusColors != null &&
-                                i < statusColors!.length
-                            ? statusColors![i]
-                            : AppColors.textPrimary;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 10),
-                          child: Text(
-                            cell.value,
-                            style: TextStyle(color: color, fontSize: 12),
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  }),
-                ],
+                  columnWidths: const {0: FixedColumnWidth(130)},
+                  children: [
+                    // Header
+                    TableRow(
+                      decoration:
+                          const BoxDecoration(color: AppColors.surfaceLight),
+                      children: headers
+                          .map((h) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 12),
+                                child: Text(h,
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    )),
+                              ))
+                          .toList(),
+                    ),
+                    // Data rows
+                    ...rows.asMap().entries.map((entry) {
+                      final i = entry.key;
+                      final row = entry.value;
+                      return TableRow(
+                        children: row.asMap().entries.map((cell) {
+                          final isLast = cell.key == row.length - 1;
+                          final color = isLast &&
+                                  statusColors != null &&
+                                  i < statusColors!.length
+                              ? statusColors![i]
+                              : AppColors.textPrimary;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 10),
+                            child: Text(
+                              cell.value,
+                              style: TextStyle(color: color, fontSize: 12),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

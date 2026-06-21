@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class Responsive {
   static const double mobileBreakpoint = 600;
 
-  static bool isMobile(BuildContext context) =>
-      MediaQuery.sizeOf(context).shortestSide < mobileBreakpoint;
+  static bool isMobile(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    // Web/Desktop should follow viewport width. Using shortestSide here made
+    // short browser windows incorrectly switch to the mobile layout.
+    if (kIsWeb) return size.width < mobileBreakpoint;
+    return size.shortestSide < mobileBreakpoint;
+  }
 
   static bool isDesktop(BuildContext context) => !isMobile(context);
 }

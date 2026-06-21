@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../core/models/models.dart';
 import '../../shared/utils/responsive.dart';
+import '../../shared/widgets/camera_plate_scanner.dart';
 
 class CheckInScreen extends StatefulWidget {
   const CheckInScreen({super.key});
@@ -90,10 +91,11 @@ class _CheckInScreenState extends State<CheckInScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Center(
+        Align(
+          alignment: isMobile ? Alignment.center : Alignment.centerLeft,
           child: Text(
             'Xe vào (Check-in)',
-            textAlign: TextAlign.center,
+            textAlign: isMobile ? TextAlign.center : TextAlign.left,
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
                   fontSize: isMobile ? 22 : null,
                 ),
@@ -104,7 +106,16 @@ class _CheckInScreenState extends State<CheckInScreen> {
                 style: TextStyle(color: AppColors.textSecondary))
             .animate()
             .fadeIn(delay: 100.ms),
-        const SizedBox(height: 32),
+        const SizedBox(height: 20),
+
+        CameraPlateScanner(
+          samplePlate: '51A-12345',
+          onDetected: (plate) => setState(() {
+            _plateCtrl.text = plate;
+            _error = null;
+          }),
+        ),
+        const SizedBox(height: 24),
 
         // Plate input
         _SectionLabel('Biển số xe'),

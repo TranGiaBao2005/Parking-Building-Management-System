@@ -106,6 +106,30 @@ class MockDataService extends ChangeNotifier {
         createdAt: DateTime.now().subtract(const Duration(days: 400)),
       ),
     ];
+
+    const sampleNames = [
+      'Nguyễn Minh Anh',
+      'Trần Quốc Huy',
+      'Lê Thị Ngọc',
+      'Phạm Gia Khánh',
+      'Hoàng Thu Trang',
+      'Võ Đức Long',
+      'Đặng Hải Yến',
+      'Bùi Thanh Tùng',
+    ];
+    users.addAll(List.generate(24, (index) {
+      final number = index + 7;
+      return AppUser(
+        id: 'u${number.toString().padLeft(3, '0')}',
+        username: 'testuser$number',
+        fullName: '${sampleNames[index % sampleNames.length]} $number',
+        email: 'testuser$number@example.com',
+        phone: '0${960000000 + index}',
+        role: UserRole.values[index % UserRole.values.length],
+        status: index % 7 == 0 ? UserStatus.inactive : UserStatus.active,
+        createdAt: DateTime.now().subtract(Duration(days: 20 + index * 3)),
+      );
+    }));
   }
 
   void _initFloors() {
@@ -897,6 +921,35 @@ class MockDataService extends ChangeNotifier {
         ? UserStatus.inactive
         : UserStatus.active;
     notifyListeners();
+  }
+
+  void updateUser({
+    required String userId,
+    required String username,
+    required String fullName,
+    required String email,
+    required String phone,
+    required UserRole role,
+    required UserStatus status,
+  }) {
+    final user = users.where((u) => u.id == userId).firstOrNull;
+    if (user == null) return;
+    user.username = username;
+    user.fullName = fullName;
+    user.email = email;
+    user.phone = phone;
+    user.role = role;
+    user.status = status;
+    notifyListeners();
+  }
+
+  bool deleteUser(String userId) {
+    if (currentUser?.id == userId) return false;
+    final initialLength = users.length;
+    users.removeWhere((user) => user.id == userId);
+    if (users.length == initialLength) return false;
+    notifyListeners();
+    return true;
   }
 
   // ─────────── AI Optimization ───────────

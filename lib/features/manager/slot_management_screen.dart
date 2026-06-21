@@ -50,11 +50,6 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
                   _buildAvailableBadge(svc),
                 ],
               ),
-              const SizedBox(height: 12),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: _buildLegend(),
-              ),
             ] else
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -66,8 +61,6 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
                       _buildAiButton(context, svc),
                       const SizedBox(width: 12),
                       _buildAvailableBadge(svc),
-                      const SizedBox(width: 20),
-                      _buildLegend(),
                     ],
                   ),
                 ],
@@ -88,7 +81,17 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
               selected: _filterStatus,
               onSelect: (s) => setState(() => _filterStatus = s),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
+
+            // Legend sits directly above the parking-slot grid.
+            SizedBox(
+              width: double.infinity,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: _buildLegend(),
+              ),
+            ),
+            const SizedBox(height: 12),
 
             // Slot grid
             Expanded(
@@ -138,7 +141,7 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
     return Row(
       children: items
           .map((item) => Padding(
-                padding: const EdgeInsets.only(left: 16),
+                padding: const EdgeInsets.only(right: 16),
                 child: Row(
                   children: [
                     Container(
