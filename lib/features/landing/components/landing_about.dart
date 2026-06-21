@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../shared/utils/responsive.dart';
 import 'dart:ui';
+import '../../../shared/widgets/parking_brand_logo.dart';
 
 class LandingAboutCtaFooter extends StatelessWidget {
   const LandingAboutCtaFooter({super.key});
@@ -13,7 +14,7 @@ class LandingAboutCtaFooter extends StatelessWidget {
     return Column(
       children: [
         _buildAboutSection(isMobile),
-        _buildCtaSection(isMobile),
+        const SizedBox(height: 40),
         _buildFooter(),
       ],
     );
@@ -129,71 +130,6 @@ class LandingAboutCtaFooter extends StatelessWidget {
     );
   }
 
-  Widget _buildCtaSection(bool isMobile) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 80),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: isMobile ? 28 : 60, vertical: 80),
-        decoration: BoxDecoration(
-          color: const Color(0xFF10182A),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.3)),
-          boxShadow: [BoxShadow(color: const Color(0xFF7C3AED).withValues(alpha: 0.1), blurRadius: 100)],
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Positioned(top: -150, left: -50, child: _glow(const Color(0xFF7C3AED).withValues(alpha: 0.2))),
-            Positioned(bottom: -150, right: -50, child: _glow(const Color(0xFF06B6D4).withValues(alpha: 0.15))),
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-                    decoration: BoxDecoration(color: const Color(0xFF7C3AED).withValues(alpha: 0.13), borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.28))),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFFA78BFA), shape: BoxShape.circle)).animate(onPlay: (c) => c.repeat(reverse: true)).fade(duration: 1.seconds),
-                        const SizedBox(width: 9),
-                        const Text('Sẵn sàng trải nghiệm', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFA78BFA))),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: const TextSpan(
-                      style: TextStyle(fontSize: 36, fontWeight: FontWeight.w800, height: 1.2, letterSpacing: -1, color: Colors.white),
-                      children: [
-                        TextSpan(text: 'Một bãi xe thông minh bắt đầu từ cách '),
-                        TextSpan(text: 'vận hành rõ ràng', style: TextStyle(color: Color(0xFF67E8F9))),
-                      ]
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Khám phá toàn bộ tính năng qua demo sẵn có. Không cần đăng ký, không cần cài đặt thêm.', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, height: 1.8, color: Color(0xFF8492A6))),
-                  const SizedBox(height: 40),
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF7C3AED), padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 18), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                    icon: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
-                    label: const Text('Lên đầu trang ↑', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0),
-    );
-  }
-
-  Widget _glow(Color color) {
-    return Container(width: 400, height: 400, decoration: BoxDecoration(shape: BoxShape.circle, color: color)).animate().custom(builder: (c,v,child) => ImageFiltered(imageFilter: ImageFilter.blur(sigmaX: 90, sigmaY: 90), child: child));
-  }
-
   Widget _buildFooter() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 30),
@@ -203,8 +139,8 @@ class LandingAboutCtaFooter extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.apps_rounded, color: Color(0xFFA78BFA), size: 16),
-              SizedBox(width: 8),
+              const ParkingBrandLogo(size: 24),
+              const SizedBox(width: 10),
               Text('ParkSmart SWP08', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Colors.white)),
             ],
           ),

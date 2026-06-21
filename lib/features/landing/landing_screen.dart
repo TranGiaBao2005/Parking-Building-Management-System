@@ -112,20 +112,7 @@ class _LandingScreenState extends State<LandingScreen> {
         children: [
           Row(
             children: [
-              Container(
-                width: 36, height: 36,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.4)),
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF7C3AED).withValues(alpha: 0.35),
-                      const Color(0xFF06B6D4).withValues(alpha: 0.2),
-                    ],
-                  ),
-                ),
-                child: const Icon(Icons.apps_rounded, color: Color(0xFFA78BFA), size: 18),
-              ),
+              const ParkingBrandLogo(size: 36),
               const SizedBox(width: 12),
               const Column(
                 mainAxisAlignment: MainAxisAlignment.center,

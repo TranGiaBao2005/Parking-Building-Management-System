@@ -111,15 +111,15 @@ code {
 .brand { display: flex; align-items: center; gap: 11px; }
 .brand-logo {
   width: 36px; height: 36px;
-  display: grid; place-items: center;
-  background: linear-gradient(135deg, rgba(124,58,237,.35), rgba(6,182,212,.2));
-  border: 1px solid rgba(124,58,237,.4);
+  display: block;
+  object-fit: contain;
+  background: transparent;
+  border: 0;
   border-radius: 10px;
-  color: var(--purple-l);
   flex-shrink: 0;
-  transition: box-shadow var(--t);
+  transition: filter var(--t), transform var(--t);
 }
-.brand:hover .brand-logo { box-shadow: 0 0 20px rgba(124,58,237,.35); }
+.brand:hover .brand-logo { filter: drop-shadow(0 0 10px rgba(124,58,237,.45)); transform: translateY(-1px); }
 .brand-logo.sm { width: 26px; height: 26px; border-radius: 7px; }
 .brand-text { line-height: 1.1; }
 .brand-name { display: block; font-size: 14.5px; font-weight: 700; }
