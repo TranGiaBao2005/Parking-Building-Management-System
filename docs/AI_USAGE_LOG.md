@@ -78,6 +78,55 @@ Mục đích:
 
 ## Log History
 
+## [2026-06-21 17:56:00] - Sửa lỗi không hiển thị đúng Logo trên Flutter Web
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | Antigravity AI                                                                                                       |
+| Support Type               | UI fix / Debug                                                                                                       |
+| Estimated AI Support       | 95% AI suggestion, 5% developer review                                                                               |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+- "index sao logo link đúng mà sao run wed thì ra hình khác"
+- "save trò chuyện"
+
+### AI Assistance Summary
+
+- Giải thích nguyên nhân: File `landing/index.html` chỉ là file HTML mẫu, còn ứng dụng Flutter sử dụng widget độc lập để render UI.
+- Sửa lỗi không đồng bộ logo: Ứng dụng Flutter đang dùng icon tạm thời `Icons.apps_rounded`. Thay thế toàn bộ các icon này ở Navbar và Footer của Landing Page bằng widget `ParkingBrandLogo` có sẵn trong source code để khớp hoàn toàn với thiết kế SVG.
+- Thực hiện Hot Reload trên Chrome để xác nhận kết quả.
+
+### Files Created / Modified / Deleted
+
+| File            | Action   | Summary          |
+| --------------- | -------- | ---------------- |
+| `lib/features/landing/landing_screen.dart` | Modified | Import và sử dụng `ParkingBrandLogo(size: 36)` thay thế cho placeholder Container icon. |
+| `lib/features/landing/components/landing_about.dart` | Modified | Sử dụng `ParkingBrandLogo(size: 24)` ở Footer. |
+| `landing/index.html` | Modified (by User) | Cập nhật thẻ meta, thẻ img logo và text khẩu hiệu. |
+| `landing/styles.css` | Modified (by User) | Cập nhật style CSS liên quan đến landing page HTML. |
+
+### Commands Run & Results
+
+| Command                                             | Result                       |
+| --------------------------------------------------- | ---------------------------- |
+| `flutter run -d chrome`                             | Background Task              |
+| `git status --short --branch --untracked-files=all` | Success (Modified 5 files)   |
+
+### Git Status Summary
+
+Modified `docs/AI_USAGE_LOG.md`, `landing/index.html`, `landing/styles.css`, `lib/features/landing/components/landing_about.dart`, `lib/features/landing/landing_screen.dart`. No commit made.
+
+### Developer Review Notes
+
+- Developer cần review và verify thay đổi logo trên UI.
+- Developer tiến hành commit code khi hoàn thành.
+
+---
+
+
 ## [2026-06-21 17:15:00] - Sửa lỗi giao diện Landing Page và xóa CTA Section
 
 | Field                      | Content                                                                                                              |
