@@ -254,7 +254,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                       _UH(flex: 1, text: 'Username'),
                                       _UH(flex: 1, text: 'Role / Vai trò'),
                                       _UH(flex: 1, text: 'Trạng thái'),
-                                      _UH(flex: 1, text: 'Thao tác'),
+                                      _UH(
+                                        flex: 1,
+                                        text: 'Thao tác',
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -364,41 +368,54 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                               )),
                                           _UC(
                                               flex: 1,
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  _UserActionButton(
-                                                    tooltip: 'Chi tiết',
-                                                    icon: Icons
-                                                        .visibility_outlined,
-                                                    color: AppColors.primary,
-                                                    onPressed: () =>
-                                                        _showUserDetails(
-                                                            context,
-                                                            user,
-                                                            dtFmt),
+                                              child: Center(
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      _UserActionButton(
+                                                        tooltip: 'Chi tiết',
+                                                        icon: Icons
+                                                            .visibility_outlined,
+                                                        color:
+                                                            AppColors.primary,
+                                                        onPressed: () =>
+                                                            _showUserDetails(
+                                                                context,
+                                                                user,
+                                                                dtFmt),
+                                                      ),
+                                                      const SizedBox(width: 6),
+                                                      _UserActionButton(
+                                                        tooltip: 'Chỉnh sửa',
+                                                        icon:
+                                                            Icons.edit_outlined,
+                                                        color:
+                                                            AppColors.reserved,
+                                                        onPressed: () =>
+                                                            _showEditUserDialog(
+                                                                context,
+                                                                svc,
+                                                                user),
+                                                      ),
+                                                      const SizedBox(width: 6),
+                                                      _UserActionButton(
+                                                        tooltip: 'Xóa',
+                                                        icon: Icons
+                                                            .delete_outline,
+                                                        color:
+                                                            AppColors.occupied,
+                                                        onPressed: () =>
+                                                            _confirmDeleteUser(
+                                                                context,
+                                                                svc,
+                                                                user),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  const SizedBox(width: 6),
-                                                  _UserActionButton(
-                                                    tooltip: 'Chỉnh sửa',
-                                                    icon: Icons.edit_outlined,
-                                                    color: AppColors.reserved,
-                                                    onPressed: () =>
-                                                        _showEditUserDialog(
-                                                            context, svc, user),
-                                                  ),
-                                                  const SizedBox(width: 6),
-                                                  _UserActionButton(
-                                                    tooltip: 'Xóa',
-                                                    icon: Icons.delete_outline,
-                                                    color: AppColors.occupied,
-                                                    onPressed: () =>
-                                                        _confirmDeleteUser(
-                                                            context, svc, user),
-                                                  ),
-                                                ],
+                                                ),
                                               )),
                                         ],
                                       );
@@ -1092,7 +1109,12 @@ class _RoleFilterChip extends StatelessWidget {
 class _UH extends StatelessWidget {
   final int flex;
   final String text;
-  const _UH({required this.flex, required this.text});
+  final TextAlign textAlign;
+  const _UH({
+    required this.flex,
+    required this.text,
+    this.textAlign = TextAlign.left,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1101,6 +1123,7 @@ class _UH extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Text(text,
+            textAlign: textAlign,
             style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 12,

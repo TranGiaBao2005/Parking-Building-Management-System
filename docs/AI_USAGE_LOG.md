@@ -78,6 +78,57 @@ Mục đích:
 
 ## Log History
 
+## [2026-06-21 15:00:01] - Căn hàng Action trên bảng tài khoản mobile
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Mobile UI / Table action alignment / Verification                                                                   |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Chỉnh mobile Admin: trong table quản lý tài khoản, các action Edit, Delete, View nằm đúng theo hàng Action.
+
+### AI Assistance Summary
+
+- Căn giữa tiêu đề cột Thao tác.
+- Khóa ba nút View, Edit và Delete trong một hàng ngang duy nhất.
+- Dùng `FittedBox` để nhóm action tự thu nhỏ khi cần trên mobile, không xuống dòng hoặc tràn khỏi ô.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/admin/user_management_screen.dart` | Modified | Căn nhóm action thành một hàng responsive trên mobile. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format lib/features/admin/user_management_screen.dart` | Passed; file đã đúng định dạng. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; sau khi ghi log có 2 file tracked đã sửa, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan trên thiết bị mobile.
+- Định dạng và kiểm tra khoảng trắng đạt.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Có 2 file tracked đã sửa. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần kiểm tra cột Action ở chiều rộng mobile thực tế và thử cả ba nút.
+- Chạy `flutter analyze` và `flutter test` trước khi commit.
+
+---
+
 ## [2026-06-21 14:05:00] - Thu gọn badge trạng thái tài khoản
 
 | Field                      | Content                                                                                                              |
