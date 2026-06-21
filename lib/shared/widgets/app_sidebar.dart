@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/models/app_user.dart';
 import '../../core/services/mock_data_service.dart';
+import 'parking_brand_logo.dart';
 
 class NavItem {
   final String label;
@@ -77,18 +78,7 @@ class AppSidebar extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [accentColor, AppColors.accent],
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.local_parking,
-                          color: Colors.white, size: 20),
-                    ),
+                    const ParkingBrandLogo(size: 36),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(

@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/models/models.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../shared/utils/responsive.dart';
+import '../../shared/widgets/parking_brand_logo.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -204,18 +205,10 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, AppColors.accent],
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child:
-                const Icon(Icons.local_parking, color: Colors.white, size: 36),
-          ).animate().fadeIn(delay: 200.ms).slideY(begin: -0.3),
+          const ParkingBrandLogo(size: 64)
+              .animate()
+              .fadeIn(delay: 200.ms)
+              .slideY(begin: -0.3),
           const SizedBox(height: 20),
           Text(
             'Hệ thống Quản lý\nBãi Đậu Xe',
@@ -263,18 +256,10 @@ class _LoginScreenState extends State<LoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Logo
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, AppColors.accent],
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child:
-                const Icon(Icons.local_parking, color: Colors.white, size: 40),
-          ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.3),
+          const ParkingBrandLogo(size: 72)
+              .animate()
+              .fadeIn(delay: 200.ms)
+              .slideX(begin: -0.3),
           const SizedBox(height: 32),
           Text(
             'Hệ thống Quản lý\nBãi Đậu Xe Thông Minh',

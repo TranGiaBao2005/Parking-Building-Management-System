@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../core/services/mock_data_service.dart';
+import '../../core/models/models.dart';
+import '../../features/landing/landing_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/manager/manager_shell.dart';
 import '../../features/manager/dashboard_screen.dart';
@@ -23,14 +25,40 @@ import '../../features/admin/system_config_screen.dart';
 import '../../features/admin/user_management_screen.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/login',
+  initialLocation: kIsWeb ? '/' : '/login',
   redirect: (context, state) {
     final svc = context.read<MockDataService>();
     final loggedIn = svc.currentUser != null;
-    if (!loggedIn && state.matchedLocation != '/login') return '/login';
+    final loc = state.matchedLocation;
+    final isGoingToLogin = loc == '/login';
+    final isGoingToLanding = loc == '/';
+
+    if (!loggedIn) {
+      if (kIsWeb && isGoingToLanding) return null;
+      if (isGoingToLogin) return null;
+      return kIsWeb ? '/' : '/login';
+    }
+
+    if (loggedIn && (isGoingToLogin || isGoingToLanding)) {
+      switch (svc.currentUser!.role) {
+        case UserRole.manager:
+          return '/manager';
+        case UserRole.staff:
+          return '/staff';
+        case UserRole.driver:
+          return '/driver';
+        case UserRole.admin:
+          return '/admin';
+      }
+    }
     return null;
   },
   routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) =>
+          kIsWeb ? const LandingScreen() : const LoginScreen(),
+    ),
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
