@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/models/models.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../shared/utils/responsive.dart';
+import '../../shared/utils/remember_login_storage.dart';
 import '../../shared/widgets/parking_brand_logo.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,17 +24,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _confirmPasswordCtrl = TextEditingController();
+  final _captchaCtrl = TextEditingController();
   bool _loading = false;
   bool _obscure = true;
   bool _registerMode = false;
+  bool _rememberLogin = false;
+  int _captchaLeft = 0;
+  int _captchaRight = 0;
   String? _error;
 
-  final _demoAccounts = [
-    {'role': 'Quản lý', 'username': 'manager', 'icon': '👔'},
-    {'role': 'Nhân viên', 'username': 'staff1', 'icon': '🧑‍💼'},
-    {'role': 'Người gửi xe', 'username': 'driver1', 'icon': '🚘'},
-    {'role': 'Quản trị viên', 'username': 'admin', 'icon': '🛠️'},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _refreshCaptcha(notify: false);
+    _loadRememberedUsername();
+  }
 
   @override
   void dispose() {
@@ -42,7 +48,31 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
     _confirmPasswordCtrl.dispose();
+    _captchaCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadRememberedUsername() async {
+    final username = await RememberLoginStorage.loadUsername();
+    if (!mounted || username == null || username.isEmpty) return;
+    setState(() {
+      _usernameCtrl.text = username;
+      _rememberLogin = true;
+    });
+  }
+
+  void _refreshCaptcha({bool notify = true}) {
+    final random = Random();
+    final update = () {
+      _captchaLeft = random.nextInt(8) + 2;
+      _captchaRight = random.nextInt(8) + 1;
+      _captchaCtrl.clear();
+    };
+    if (notify && mounted) {
+      setState(update);
+    } else {
+      update();
+    }
   }
 
   void _setMode(bool registerMode) {
@@ -68,6 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       return;
     }
+
+    if (_rememberLogin) {
+      await RememberLoginStorage.saveUsername(_usernameCtrl.text.trim());
+    } else {
+      await RememberLoginStorage.clearUsername();
+    }
+    if (!mounted) return;
 
     final user = svc.currentUser!;
     setState(() => _loading = false);
@@ -111,6 +148,12 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _error = 'Mật khẩu xác nhận không khớp.');
       return;
     }
+    final captchaAnswer = int.tryParse(_captchaCtrl.text.trim());
+    if (captchaAnswer != _captchaLeft + _captchaRight) {
+      setState(() => _error = 'Mã CAPTCHA chưa đúng. Vui lòng thử lại.');
+      _refreshCaptcha();
+      return;
+    }
 
     setState(() {
       _loading = true;
@@ -130,6 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _loading = false;
         _error = 'Tên đăng nhập đã tồn tại.';
       });
+      _refreshCaptcha();
       return;
     }
 
@@ -319,6 +363,66 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildCaptcha() {
+    return SizedBox(
+      height: 60,
+      child: Row(
+        children: [
+          Container(
+            width: 150,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withValues(alpha: 0.22),
+                  AppColors.accent.withValues(alpha: 0.12),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderLight),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '$_captchaLeft + $_captchaRight = ?',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Đổi CAPTCHA',
+                  onPressed: _refreshCaptcha,
+                  icon: const Icon(Icons.refresh_rounded,
+                      color: AppColors.accent, size: 19),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: _captchaCtrl,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: AppColors.textPrimary),
+              decoration: const InputDecoration(
+                labelText: 'Kết quả CAPTCHA',
+                prefixIcon: Icon(Icons.verified_user_outlined,
+                    color: AppColors.textSecondary),
+              ),
+              onSubmitted: (_) => _register(),
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(delay: 420.ms);
+  }
+
   Widget _buildLoginForm(bool isMobile) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -365,7 +469,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           _registerMode
               ? 'Đăng ký tài khoản dành cho người gửi xe'
-              : 'Chọn tài khoản demo bên dưới hoặc nhập thủ công',
+              : 'Nhập thông tin tài khoản để tiếp tục',
           style: isMobile
               ? Theme.of(context).textTheme.bodySmall
               : Theme.of(context).textTheme.bodyMedium,
@@ -373,44 +477,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ).animate().fadeIn(delay: 200.ms),
         const SizedBox(height: 32),
 
-        if (!_registerMode) ...[
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _demoAccounts.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 1,
-            ),
-            itemBuilder: (_, index) {
-              final acc = _demoAccounts[index];
-              return _DemoChip(
-                icon: acc['icon']!,
-                role: acc['role']!,
-                username: acc['username']!,
-                onTap: () {
-                  _usernameCtrl.text = acc['username']!;
-                  _passwordCtrl.text = '123456';
-                },
-              );
-            },
-          ).animate().fadeIn(delay: 300.ms),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              const Expanded(child: Divider(color: AppColors.border)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text('hoặc nhập thủ công',
-                    style: Theme.of(context).textTheme.bodySmall),
-              ),
-              const Expanded(child: Divider(color: AppColors.border)),
-            ],
-          ),
-          const SizedBox(height: 24),
-        ] else ...[
+        if (_registerMode) ...[
           TextField(
             controller: _fullNameCtrl,
             style: const TextStyle(color: AppColors.textPrimary),
@@ -475,6 +542,32 @@ class _LoginScreenState extends State<LoginScreen> {
           onSubmitted: (_) => _registerMode ? _register() : _login(),
         ).animate().fadeIn(delay: 400.ms),
 
+        if (!_registerMode) ...[
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () => setState(() => _rememberLogin = !_rememberLogin),
+            borderRadius: BorderRadius.circular(8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Checkbox(
+                  value: _rememberLogin,
+                  activeColor: AppColors.primary,
+                  onChanged: (value) =>
+                      setState(() => _rememberLogin = value ?? false),
+                ),
+                const Text(
+                  'Ghi nhớ tài khoản',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
         if (_registerMode) ...[
           const SizedBox(height: 16),
           TextField(
@@ -487,6 +580,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             onSubmitted: (_) => _register(),
           ),
+          const SizedBox(height: 16),
+          _buildCaptcha(),
         ],
 
         if (_error != null) ...[
@@ -545,17 +640,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
           ),
         ).animate().fadeIn(delay: 450.ms).slideY(begin: 0.3),
-
-        const SizedBox(height: 24),
-        if (!_registerMode)
-          Text(
-            'Mật khẩu demo: nhập bất kỳ',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontStyle: FontStyle.italic,
-                ),
-            textAlign: TextAlign.center,
-          ),
       ],
     );
   }
@@ -591,56 +675,6 @@ class _AuthModeButton extends StatelessWidget {
             color: selected ? Colors.white : AppColors.textSecondary,
             fontWeight: FontWeight.w600,
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DemoChip extends StatelessWidget {
-  final String icon;
-  final String role;
-  final String username;
-  final VoidCallback onTap;
-
-  const _DemoChip({
-    required this.icon,
-    required this.role,
-    required this.username,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(icon, style: const TextStyle(fontSize: 28)),
-            const SizedBox(height: 10),
-            Text(role,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600)),
-            const SizedBox(height: 3),
-            Text('@$username',
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(color: AppColors.textMuted, fontSize: 11)),
-          ],
         ),
       ),
     );

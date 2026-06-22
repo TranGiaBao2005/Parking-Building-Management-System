@@ -78,6 +78,392 @@ Mục đích:
 
 ## Log History
 
+## [2026-06-21 21:43:37] - Chuyển CAPTCHA từ đăng nhập sang đăng ký
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Frontend prototype / Form validation / Authentication UI adjustment                                                 |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Đăng ký có CAPTCHA, đăng nhập không có CAPTCHA.
+
+### AI Assistance Summary
+
+- Gỡ validation CAPTCHA khỏi hàm đăng nhập.
+- Chuyển validation CAPTCHA sang hàm đăng ký sau bước kiểm tra mật khẩu xác nhận.
+- Chỉ hiển thị CAPTCHA trong tab Đăng ký.
+- Tab Đăng nhập giữ username, mật khẩu và checkbox “Ghi nhớ tài khoản”.
+- CAPTCHA sai hoặc username đăng ký đã tồn tại sẽ tạo phép tính mới.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/auth/login_screen.dart` | Modified | Chuyển CAPTCHA sang đăng ký và giữ Remember ở đăng nhập. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format lib/features/auth/login_screen.dart` | Passed; file đã đúng định dạng. |
+| `rg` kiểm tra luồng CAPTCHA | Passed; CAPTCHA validation nằm trong `_register`, UI nằm trong nhánh đăng ký. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; có 6 file tracked đã sửa và 3 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter Web compile do quyền chạy ngoài sandbox không được cấp trong lượt trước.
+- Formatting và kiểm tra cấu trúc vị trí logic đạt.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Có 6 file tracked đã sửa và 3 file mới; `test/widget_test.dart` có thay đổi ngoài phạm vi và được giữ nguyên. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần xác nhận đăng nhập không hiển thị CAPTCHA và đăng ký bắt buộc CAPTCHA đúng.
+- Thử CAPTCHA sai, refresh CAPTCHA và username đăng ký trùng.
+- Chạy `flutter run -d chrome` trước khi commit.
+
+---
+
+## [2026-06-21 21:38:18] - Thêm CAPTCHA và Ghi nhớ tài khoản cho đăng nhập
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Frontend prototype / Authentication UI / Local storage / Validation                                                 |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Thêm CAPTCHA ở sign in và ô Remember ở login; chỉ làm frontend prototype.
+
+### AI Assistance Summary
+
+- Thêm CAPTCHA phép cộng ngẫu nhiên trên form đăng nhập, có nút tạo phép tính mới.
+- Chặn đăng nhập khi CAPTCHA sai và tự đổi CAPTCHA sau lần nhập sai.
+- Thêm checkbox “Ghi nhớ tài khoản”.
+- Bản Web lưu duy nhất username vào local storage và tự điền khi mở lại; không lưu mật khẩu.
+- Thêm conditional export để các nền tảng không phải Web dùng fallback không lưu trữ, giữ prototype biên dịch đa nền tảng.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/auth/login_screen.dart` | Modified | Thêm CAPTCHA, validation và checkbox ghi nhớ username. |
+| `lib/shared/utils/remember_login_storage.dart` | Created | Chọn implementation lưu trữ theo nền tảng. |
+| `lib/shared/utils/remember_login_storage_web.dart` | Created | Lưu username trong local storage của Web. |
+| `lib/shared/utils/remember_login_storage_stub.dart` | Created | Fallback không lưu trữ cho nền tảng khác. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format <4 relevant Dart files>` | Passed; các file đã đúng định dạng. |
+| `dart analyze <3 storage files>` | Không có lỗi; có một info do `dart:html` deprecated nhưng vẫn dùng được cho prototype. |
+| Flutter web-server compile | Chưa xác minh do yêu cầu chạy ngoài sandbox bị dừng/từ chối trong lượt trước. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; có 6 file tracked đã sửa và 3 file mới, chưa commit. |
+
+### Test / Build Result
+
+- Formatting và static check của lớp lưu trữ đạt.
+- Chưa chạy kiểm thử trực quan CAPTCHA/Remember trong Chrome.
+- Đây là frontend prototype; CAPTCHA không thay thế CAPTCHA server-side trong production.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Có 6 file tracked đã sửa và 3 file mới; `test/widget_test.dart` có thay đổi ngoài phạm vi và được giữ nguyên. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần thử CAPTCHA đúng/sai, nút refresh và reload trình duyệt với checkbox Remember.
+- Xác nhận local storage chỉ chứa username, không có password.
+- Chạy `flutter run -d chrome` và test trước khi commit.
+
+---
+
+## [2026-06-21 21:20:14] - Fix lỗi biên dịch Flutter Web landing mới
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Compile error diagnosis / Flutter fix / Web-server verification                                                     |
+| Estimated AI Support       | 90% AI diagnosis and implementation, 10% developer review                                                           |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Fix lỗi chạy sau khi thay landing page Flutter mới.
+
+### AI Assistance Summary
+
+- Chạy Flutter web-server với package config của Flutter tool để lấy lỗi biên dịch thực tế.
+- Xác định hai lỗi `Not a constant expression` tại `landing_screen.dart` do `Expanded` dùng biến local nhưng bị khai báo `const`.
+- Bỏ `const` sai tại hai khu vực Quy trình và FAQ.
+- Chạy lại web-server và xác nhận Flutter biên dịch thành công, phục vụ ứng dụng tại localhost.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/landing/landing_screen.dart` | Modified | Sửa hai biểu thức const làm Flutter Web không chạy. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên debug và kết quả xác minh. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart analyze lib` | Không dùng làm kết luận vì sandbox không đọc được toàn bộ Pub cache. |
+| `flutter run -d web-server --web-port=0 --no-pub` | Lần đầu phát hiện 2 lỗi `Not a constant expression`; sau sửa đã biên dịch thành công và phục vụ tại localhost. |
+| `dart format lib/features/landing/landing_screen.dart` | Passed. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; có 6 file tracked đã sửa, chưa commit. |
+
+### Test / Build Result
+
+- Flutter Web debug compilation: Passed.
+- Web-server khởi động thành công; tiến trình đã được tắt sạch sau kiểm tra.
+- Chưa kiểm thử thao tác trực quan toàn bộ landing trong Chrome.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Có 6 file tracked đã sửa; `test/widget_test.dart` có thay đổi ngoài phạm vi task và được giữ nguyên. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer có thể chạy lại `flutter run -d chrome`; lỗi const đã được sửa.
+- Kiểm tra responsive và nút chuyển tới `/login` trong Chrome.
+- Review thay đổi ngoài phạm vi ở `test/widget_test.dart` trước khi commit.
+
+---
+
+## [2026-06-21 21:10:00] - Fix lỗi flutter analyze ở widget_test.dart
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | Antigravity AI                                                                                                       |
+| Support Type               | Fix bug / Test                                                                                                       |
+| Estimated AI Support       | 100% AI suggestion, 0% developer review                                                                              |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer reviewed, tested, and accepted responsibility for the final code. |
+
+### User Prompt
+
+đọc code sao tui run ko đc ?
+
+### AI Assistance Summary
+
+- Đã chạy lệnh `flutter analyze` và phát hiện lỗi "The name 'MyApp' isn't a class" trong file `test/widget_test.dart`.
+- Sửa lại nội dung file test để sử dụng đúng class `ParkingApp` và thêm các import cần thiết (`Provider`, `MockDataService`).
+
+### Files Created / Modified / Deleted
+
+| File            | Action   | Summary          |
+| --------------- | -------- | ---------------- |
+| `test/widget_test.dart` | Modified | Đổi `MyApp` thành `ParkingApp` và sửa lỗi. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command                                             | Result                       |
+| --------------------------------------------------- | ---------------------------- |
+| `flutter analyze`                                   | Đã xử lý lỗi duy nhất trong file test |
+
+### Git Status Summary
+
+Modified `test/widget_test.dart`, `docs/AI_USAGE_LOG.md`.
+
+### Developer Review Notes
+
+- Developer có thể chạy thử nghiệm nghiệm lại dự án xem còn lỗi nào xảy ra khi run hay không.
+
+---
+
+## [2026-06-21 21:05:52] - Thay LandingScreen Flutter bằng trang khách gửi xe mới
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Flutter landing replacement / Responsive UI / Routing-compatible implementation / Verification                     |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Thay thế trang giới thiệu cũ trong Flutter Web bằng trang khách hàng mới để chạy `flutter run -d chrome` hiển thị đúng.
+
+### AI Assistance Summary
+
+- Xác định `flutter run` render `LandingScreen` tại route `/`, không đọc file static `landing/index.html`.
+- Viết lại hoàn toàn `lib/features/landing/landing_screen.dart` theo chủ đề duy nhất dành cho khách gửi xe.
+- Thêm navbar, hero, mobile app preview, lợi ích, quy trình 4 bước, thẻ lượt gửi, đánh giá, FAQ và CTA đăng nhập.
+- Giữ route `/login` cho nút đăng nhập/đăng ký và giữ responsive desktop/mobile.
+- Loại bỏ việc sử dụng các component landing cũ khỏi `LandingScreen` mà không xóa file ngoài phạm vi.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `lib/features/landing/landing_screen.dart` | Rewritten | Landing Flutter mới dành cho khách gửi xe tại route `/`. |
+| `landing/index.html` | Modified | Phiên bản static đồng bộ chủ đề khách hàng. |
+| `landing/styles.css` | Modified | CSS static đồng bộ landing mới. |
+| `lib/features/auth/login_screen.dart` | Modified | Màn login không còn tài khoản demo. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format <2 Dart files>` | Passed; các file được định dạng. |
+| `dart analyze lib/features/landing/landing_screen.dart` | Passed; không báo lỗi. |
+| `flutter build web --no-pub` | Đã gọi nhưng không có output và artifact không được cập nhật; chưa thể xác nhận build thành công. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; có 5 file tracked đã sửa, chưa commit. |
+
+### Test / Build Result
+
+- Static analysis của LandingScreen đạt.
+- Flutter Web build chưa được xác nhận do lệnh không cập nhật artifact trong môi trường hiện tại.
+- Chưa kiểm thử trực quan bằng `flutter run -d chrome` sau thay đổi.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Có 5 file tracked đã sửa. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần dừng phiên Flutter đang chạy và chạy lại `flutter run -d chrome`; hot reload có thể không thay toàn bộ landing/root route.
+- Kiểm tra các nút đăng nhập chuyển đúng tới `/login` và bố cục mobile không tràn.
+- Chạy `flutter build web` và `flutter test` trước khi commit.
+
+---
+
+## [2026-06-21 20:47:05] - Viết lại landing page chỉ dành cho khách gửi xe
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Full website redesign / Customer experience / Responsive UI / Verification                                           |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Thiết kế lại trang giới thiệu website với chủ đề duy nhất dành cho khách hàng gửi xe.
+
+### AI Assistance Summary
+
+- Thay toàn bộ HTML/CSS landing cũ bằng một website mới chỉ dành cho người gửi xe; không còn section Manager, Staff, Admin, role, demo hoặc công nghệ nội bộ trong source.
+- Thiết kế hero với bản xem trước giao diện mobile dành cho khách hàng.
+- Xây dựng các section lợi ích, quy trình gửi xe 4 bước, an toàn lượt gửi, đánh giá khách hàng, FAQ và CTA.
+- Đồng bộ logo ParkSmart và tối ưu responsive cho desktop, tablet, mobile.
+- Giữ thay đổi trước đó: màn đăng nhập Flutter không còn ô tài khoản demo.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `landing/index.html` | Rewritten | Landing page thuần chủ đề khách gửi xe. |
+| `landing/styles.css` | Rewritten | Hệ thống giao diện responsive mới cho landing. |
+| `lib/features/auth/login_screen.dart` | Modified | Giữ màn login sạch, không có tài khoản demo. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `rg` kiểm tra nội dung nội bộ | Passed; không còn nội dung Manager, Admin, role, demo hoặc dashboard trong landing mới. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; có 4 file tracked đã sửa, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy kiểm thử trực quan website trong trình duyệt.
+- Kiểm tra nội dung và khoảng trắng đạt.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Có 4 file tracked đã sửa. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần mở `landing/index.html` trên desktop/mobile để duyệt bố cục cuối cùng.
+- Kiểm tra font Google khi deploy; giao diện có fallback system font nếu offline.
+- Chạy kiểm thử dự án trước khi commit.
+
+---
+
+## [2026-06-21 20:37:00] - Thiết kế landing cho khách gửi xe và xóa tài khoản demo
+
+| Field                      | Content                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                 |
+| Support Type               | Website redesign / Customer experience / Login UI cleanup / Verification                                            |
+| Estimated AI Support       | 90% AI suggestion and implementation, 10% developer review                                                          |
+| Human Reviewer             | Trần Gia Bảo                                                                                                         |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+Thiết kế lại website giới thiệu ở index theo chủ đề dành cho khách hàng đậu xe và xóa các ô tài khoản demo ở màn đăng nhập.
+
+### AI Assistance Summary
+
+- Chuyển hero và navigation sang thông điệp dành cho người gửi xe.
+- Thêm các khu vực mới: lợi ích khách hàng, quy trình đặt/gửi xe 4 bước, an toàn thông tin lượt gửi và CTA đăng ký.
+- Thêm thẻ lượt gửi mẫu để khách hàng hiểu cách theo dõi biển số, slot, giờ vào và trạng thái.
+- Ẩn các phần landing nội bộ cũ về role quản lý, tài khoản demo, công nghệ và quản trị khỏi giao diện website.
+- Xóa bốn ô tài khoản demo, logic tự điền demo và dòng mật khẩu demo khỏi màn đăng nhập Flutter.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| ---- | ------ | ------- |
+| `landing/index.html` | Modified | Thiết kế lại nội dung landing theo góc nhìn khách gửi xe. |
+| `landing/styles.css` | Modified | Thêm giao diện responsive cho các section khách hàng. |
+| `lib/features/auth/login_screen.dart` | Modified | Xóa toàn bộ ô và nội dung tài khoản demo. |
+| `docs/AI_USAGE_LOG.md` | Modified | Ghi nhận phiên hỗ trợ AI. |
+
+### Commands Run & Results
+
+| Command | Result |
+| ------- | ------ |
+| `dart format lib/features/auth/login_screen.dart` | Passed; file được định dạng. |
+| `rg` kiểm tra tài khoản demo | Passed; không còn `_demoAccounts`, `_DemoChip` hoặc nội dung mật khẩu demo trong login. |
+| `git diff --check` | Passed; không có lỗi khoảng trắng. |
+| `git status --short --branch --untracked-files=all` | Branch `frontend`; sau khi ghi log có 4 file tracked đã sửa, chưa commit. |
+
+### Test / Build Result
+
+- Chưa chạy Flutter build hoặc kiểm thử trực quan website trong trình duyệt.
+- Dart formatting và whitespace check đạt.
+
+### Git Status Summary
+
+Branch `frontend` đang theo dõi `origin/frontend`. Có 4 file tracked đã sửa. Không commit hoặc push.
+
+### Developer Review Notes
+
+- Developer cần mở landing page trên desktop/mobile để duyệt bố cục khách hàng và nội dung tiếng Việt.
+- Kiểm tra màn đăng nhập/đăng ký sau khi bỏ tài khoản demo.
+- Chạy `flutter analyze` và `flutter test` trước khi commit.
+
+---
+
 ## [2026-06-21 17:56:00] - Sửa lỗi không hiển thị đúng Logo trên Flutter Web
 
 | Field                      | Content                                                                                                              |

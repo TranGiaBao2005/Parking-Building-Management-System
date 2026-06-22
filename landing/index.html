@@ -5,1116 +5,256 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="ParkSmart SWP08 — Nền tảng quản lý bãi đỗ xe thông minh, an toàn và hiệu quả. Quản lý slot real-time, check-in/out nhanh, đặt chỗ trước và báo cáo doanh thu."
+      content="ParkSmart SWP08 giúp khách hàng tìm chỗ trống, đặt chỗ trước, vào bãi nhanh và theo dõi lượt gửi xe minh bạch."
     />
-    <title>ParkSmart SWP08 — Quản lý bãi đỗ xe thông minh</title>
+    <meta name="theme-color" content="#080b16" />
+    <title>ParkSmart SWP08 — Gửi xe dễ dàng hơn</title>
     <link rel="icon" href="logo.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <!-- ══════════════════════ NAVBAR ══════════════════════ -->
-    <header class="navbar" id="navbar">
-      <div class="shell nav-inner">
-        <a class="brand" href="#top">
-          <img class="brand-logo" src="logo.svg" alt="Logo ParkSmart" />
-          <div class="brand-text">
-            <span class="brand-name">ParkSmart</span>
-            <span class="brand-tag">SWP08</span>
-          </div>
+    <header class="site-header">
+      <div class="shell nav-wrap">
+        <a class="brand" href="#top" aria-label="ParkSmart SWP08">
+          <img src="logo.svg" alt="Logo ParkSmart" />
+          <span><strong>ParkSmart</strong><small>SWP08</small></span>
         </a>
 
-        <nav class="nav-links">
-          <a href="#features">Tính năng</a>
-          <a href="#roles">Vai trò</a>
-          <a href="#workflow">Quy trình</a>
-          <a href="#demo">Demo</a>
-          <a href="#tech">Công nghệ</a>
+        <nav class="desktop-nav" aria-label="Điều hướng chính">
+          <a href="#benefits">Lợi ích</a>
+          <a href="#how-it-works">Cách gửi xe</a>
+          <a href="#safety">An toàn</a>
+          <a href="#faq">Hỏi đáp</a>
         </nav>
 
-        <div class="nav-cta">
-          <a class="btn-nav-ghost" href="#demo">Xem demo</a>
-          <a class="btn-nav-primary" href="#top">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <polygon points="5,3 19,12 5,21" />
-            </svg>
-            Khám phá ngay
-          </a>
-        </div>
-
-        <button class="hamburger" id="menuBtn" aria-label="Menu">
+        <a class="nav-button" href="#get-started">Bắt đầu</a>
+        <button class="menu-button" id="menuButton" aria-label="Mở menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
-
-      <div class="mobile-drawer" id="mobileDrawer">
-        <nav>
-          <a href="#features" onclick="closeDrawer()">Tính năng</a>
-          <a href="#roles" onclick="closeDrawer()">Vai trò</a>
-          <a href="#workflow" onclick="closeDrawer()">Quy trình</a>
-          <a href="#demo" onclick="closeDrawer()">Demo</a>
-          <a href="#tech" onclick="closeDrawer()">Công nghệ</a>
-        </nav>
-        <a href="#demo" class="drawer-cta" onclick="closeDrawer()"
-          >Xem tài khoản demo →</a
-        >
-      </div>
+      <nav class="mobile-nav" id="mobileNav" aria-label="Điều hướng mobile">
+        <a href="#benefits">Lợi ích</a>
+        <a href="#how-it-works">Cách gửi xe</a>
+        <a href="#safety">An toàn</a>
+        <a href="#faq">Hỏi đáp</a>
+      </nav>
     </header>
 
     <main id="top">
-      <!-- ══════════════════════ HERO ══════════════════════ -->
-      <section class="hero">
-        <!-- Background canvas -->
-        <div class="hero-bg">
-          <div class="orb orb-a"></div>
-          <div class="orb orb-b"></div>
-          <div class="orb orb-c"></div>
-          <div class="grid-lines"></div>
-          <div class="noise-overlay"></div>
-        </div>
-
-        <div class="shell hero-inner">
-          <!-- Copy -->
-          <div class="hero-copy" data-aos="fade-up">
-            <div class="hero-pill">
-              <span class="pill-dot"></span>
-              Đồ án SU26SWP08 &nbsp;·&nbsp; Flutter &amp; Dart
-            </div>
-
-            <h1>
-              Vận hành bãi đỗ xe<br />
-              <em class="grad-em">thông minh, an toàn</em><br />
-              và hiệu quả
-            </h1>
-
-            <p class="hero-sub">
-              ParkSmart kết nối quản lý slot real-time, check-in/out tức thì,
-              đặt chỗ trước và báo cáo doanh thu — trong
-              <strong>một nền tảng thống nhất</strong> dành cho 4 vai trò người
-              dùng.
-            </p>
-
-            <div class="hero-btns">
-              <a class="btn-primary-lg" href="#features">
-                Khám phá tính năng
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12,5 19,12 12,19" />
-                </svg>
-              </a>
-              <a class="btn-ghost-lg" href="#workflow">Xem cách hoạt động</a>
-            </div>
-
-            <div class="hero-stats">
-              <div class="hstat"><strong>190</strong><span>ô đỗ xe</span></div>
-              <div class="hstat-sep"></div>
-              <div class="hstat"><strong>4</strong><span>tầng xe</span></div>
-              <div class="hstat-sep"></div>
-              <div class="hstat"><strong>4</strong><span>vai trò</span></div>
-              <div class="hstat-sep"></div>
-              <div class="hstat">
-                <strong class="live-text">Live</strong><span>trạng thái</span>
-              </div>
-            </div>
+      <section class="hero shell">
+        <div class="hero-copy reveal">
+          <div class="eyebrow"><i></i> GIẢI PHÁP DÀNH CHO NGƯỜI GỬI XE</div>
+          <h1>
+            Chỗ đậu phù hợp,<br />
+            <em>hành trình chủ động.</em>
+          </h1>
+          <p>
+            ParkSmart giúp bạn xem chỗ trống, đặt trước vị trí, vào bãi bằng
+            biển số và theo dõi toàn bộ lượt gửi xe trong một trải nghiệm đơn
+            giản, minh bạch.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#how-it-works">Xem cách sử dụng</a>
+            <a class="button secondary" href="#benefits">Khám phá lợi ích</a>
           </div>
-
-          <!-- Dashboard mockup -->
-          <div class="hero-visual" data-aos="fade-left" data-aos-delay="200">
-            <div class="mockup-wrap">
-              <!-- Glow rings -->
-              <div class="ring ring-1"></div>
-              <div class="ring ring-2"></div>
-
-              <div class="dashboard-card">
-                <!-- Window chrome -->
-                <div class="window-chrome">
-                  <div class="chrome-dots">
-                    <span class="cdot red"></span>
-                    <span class="cdot yellow"></span>
-                    <span class="cdot green"></span>
-                  </div>
-                  <span class="chrome-title">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12,6 12,12 16,14" />
-                    </svg>
-                    ParkSmart — Quản lý tầng 1
-                  </span>
-                  <div class="chrome-live"><i></i> Live</div>
-                </div>
-
-                <!-- Stat bar -->
-                <div class="dash-stats">
-                  <div class="ds green">
-                    <span>Slot trống</span>
-                    <strong>86</strong>
-                    <small>+12 hôm nay</small>
-                  </div>
-                  <div class="ds red">
-                    <span>Đang dùng</span>
-                    <strong>74</strong>
-                    <small>46% công suất</small>
-                  </div>
-                  <div class="ds purple">
-                    <span>Doanh thu</span>
-                    <strong>2.4M</strong>
-                    <small>hôm nay</small>
-                  </div>
-                  <div class="ds cyan">
-                    <span>Lượt xe</span>
-                    <strong>128</strong>
-                    <small>hôm nay</small>
-                  </div>
-                </div>
-
-                <!-- Slot grid -->
-                <div class="dash-floor">
-                  <span class="floor-label">Tầng 1 — Xe máy</span>
-                  <div class="slot-grid" id="slotGrid">
-                    <!-- JS fills this -->
-                  </div>
-                  <div class="slot-legend">
-                    <span class="sl free">■ Trống</span>
-                    <span class="sl busy">■ Có xe</span>
-                    <span class="sl rsv">■ Đặt trước</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Floating badges -->
-              <div class="fbadge fb-checkin">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                >
-                  <polyline points="20,6 9,17 4,12" />
-                </svg>
-                Check-in thành công
-              </div>
-              <div class="fbadge fb-revenue">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <polyline points="23,6 13.5,15.5 8.5,10.5 1,18" />
-                  <polyline points="17,6 23,6 23,12" />
-                </svg>
-                Doanh thu +18%
-              </div>
-              <div class="fbadge fb-alert">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                A07 — Đặt trước
-              </div>
-            </div>
+          <div class="hero-trust">
+            <span><b>24/7</b><small>Theo dõi lượt gửi</small></span>
+            <span><b>4 bước</b><small>Đặt chỗ đơn giản</small></span>
+            <span><b>Minh bạch</b><small>Thời gian và chi phí</small></span>
           </div>
         </div>
 
-        <!-- Scroll hint -->
-        <div class="scroll-hint">
-          <div class="scroll-line"></div>
-          <span>cuộn xuống</span>
+        <div class="phone-stage reveal delay-1" aria-label="Giao diện ParkSmart dành cho khách gửi xe">
+          <div class="glow glow-one"></div>
+          <div class="glow glow-two"></div>
+          <div class="phone">
+            <div class="phone-top"><span>9:41</span><i></i><b>•••</b></div>
+            <div class="app-head">
+              <div><small>Xin chào, Minh Anh</small><h2>Tìm chỗ đậu xe</h2></div>
+              <img src="logo.svg" alt="ParkSmart" />
+            </div>
+            <div class="availability">
+              <div><span class="live-dot"></span><small>BÃI XE SWP08</small></div>
+              <strong>86 <em>slot trống</em></strong>
+              <p>Cập nhật ngay lúc này</p>
+            </div>
+            <div class="quick-title"><b>Chọn loại phương tiện</b><span>Xem tất cả</span></div>
+            <div class="vehicle-options">
+              <article class="selected"><span>🚗</span><b>Ô tô</b><small>42 chỗ</small></article>
+              <article><span>🛵</span><b>Xe máy</b><small>38 chỗ</small></article>
+              <article><span>🚚</span><b>Xe tải</b><small>6 chỗ</small></article>
+            </div>
+            <button class="book-button">Đặt chỗ ngay <span>→</span></button>
+            <div class="active-session">
+              <div class="session-icon">P</div>
+              <div><small>LƯỢT GỬI GẦN NHẤT</small><b>51A-12345 · A-07</b></div>
+              <span>Đã xong</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- ══════════════════════ FEATURES ══════════════════════ -->
-      <section id="features" class="section features-section">
+      <section id="benefits" class="section benefits-section">
         <div class="shell">
-          <div class="sec-head" data-aos="fade-up">
-            <span class="sec-label">TÍNH NĂNG CHÍNH</span>
-            <h2>
-              Mọi công việc trong <span class="g-text">một hệ thống</span>
-            </h2>
-            <p>
-              Từ cổng vào đến báo cáo cuối ngày, mọi thao tác đều được tổ chức
-              rõ ràng và phản hồi tức thì.
-            </p>
+          <div class="section-heading reveal">
+            <span>LỢI ÍCH CHO KHÁCH HÀNG</span>
+            <h2>Gửi xe nhẹ nhàng hơn từ trước khi bạn đến</h2>
+            <p>Mọi tính năng được thiết kế xoay quanh sự chủ động và an tâm của người gửi xe.</p>
           </div>
-
-          <div class="feat-grid">
-            <article class="feat-card" data-aos="fade-up" data-aos-delay="0">
-              <div class="feat-icon-wrap" style="--c: #7c3aed">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
-                  <rect x="3" y="3" width="18" height="18" rx="3" />
-                </svg>
-              </div>
-              <h3>Quản lý slot real-time</h3>
-              <p>
-                Theo dõi trạng thái từng ô đỗ — trống, có xe, đặt trước, bảo trì
-                — trên sơ đồ trực quan theo từng tầng.
-              </p>
-              <div class="feat-chip">190 ô đỗ / 4 tầng</div>
+          <div class="benefit-grid">
+            <article class="benefit-card reveal">
+              <div class="icon purple">⌖</div>
+              <h3>Biết chỗ trống trước</h3>
+              <p>Kiểm tra tình trạng bãi và chọn thời gian phù hợp trước khi bắt đầu hành trình.</p>
             </article>
-
-            <article class="feat-card" data-aos="fade-up" data-aos-delay="60">
-              <div class="feat-icon-wrap" style="--c: #06b6d4">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12,6 12,12 16,14" />
-                </svg>
-              </div>
-              <h3>Check-in / Check-out nhanh</h3>
-              <p>
-                Nhập biển số, chọn loại xe, hệ thống tự tìm slot phù hợp. Kết
-                thúc phiên: tính phí và in vé tức thì.
-              </p>
-              <div class="feat-chip">Xe máy · Ô tô · Xe tải</div>
+            <article class="benefit-card reveal delay-1">
+              <div class="icon cyan">▣</div>
+              <h3>Đặt chỗ trực tuyến</h3>
+              <p>Chọn loại xe, thời gian và khu vực mong muốn chỉ trong vài thao tác.</p>
             </article>
-
-            <article class="feat-card" data-aos="fade-up" data-aos-delay="120">
-              <div class="feat-icon-wrap" style="--c: #10b981">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-              </div>
-              <h3>Đặt chỗ trước (Prebooking)</h3>
-              <p>
-                Người gửi xe chủ động chọn thời gian, loại xe và tầng trước khi
-                đến. Nhận mã xác nhận và QR code ngay.
-              </p>
-              <div class="feat-chip">Mã QR · Xác nhận tức thì</div>
+            <article class="benefit-card reveal delay-2">
+              <div class="icon green">→</div>
+              <h3>Vào bãi nhanh</h3>
+              <p>Biển số được nhận diện để xác nhận lượt đặt và giảm thời gian chờ tại cổng.</p>
             </article>
-
-            <article class="feat-card" data-aos="fade-up" data-aos-delay="0">
-              <div class="feat-icon-wrap" style="--c: #f97316">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-                  />
-                  <line x1="12" y1="9" x2="12" y2="13" />
-                  <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
-              </div>
-              <h3>Xử lý sự cố ngoại lệ</h3>
-              <p>
-                Tập hợp các trường hợp mất vé, sai biển số, quá giờ, chưa thanh
-                toán — nhân viên giải quyết ngay tại chỗ.
-              </p>
-              <div class="feat-chip">Mất vé · Quá giờ · Sai biển</div>
+            <article class="benefit-card reveal">
+              <div class="icon orange">◷</div>
+              <h3>Theo dõi lượt gửi</h3>
+              <p>Xem giờ vào, vị trí slot và trạng thái phương tiện bất cứ lúc nào.</p>
             </article>
-
-            <article class="feat-card" data-aos="fade-up" data-aos-delay="60">
-              <div class="feat-icon-wrap" style="--c: #ec4899">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <line x1="18" y1="20" x2="18" y2="10" />
-                  <line x1="12" y1="20" x2="12" y2="4" />
-                  <line x1="6" y1="20" x2="6" y2="14" />
-                </svg>
-              </div>
-              <h3>Báo cáo &amp; thống kê</h3>
-              <p>
-                Biểu đồ doanh thu 7 ngày, lưu lượng xe theo giờ, công suất bãi —
-                tất cả hiển thị trực quan cho manager.
-              </p>
-              <div class="feat-chip">Doanh thu · Lưu lượng · Công suất</div>
+            <article class="benefit-card reveal delay-1">
+              <div class="icon pink">₫</div>
+              <h3>Chi phí minh bạch</h3>
+              <p>Thời gian gửi và chính sách giá được trình bày rõ ràng khi hoàn tất.</p>
             </article>
-
-            <article class="feat-card" data-aos="fade-up" data-aos-delay="120">
-              <div class="feat-icon-wrap" style="--c: #3b82f6">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </div>
-              <h3>Quản lý tài khoản &amp; bảo mật</h3>
-              <p>
-                Admin toàn quyền thêm/sửa/xóa tài khoản, phân quyền theo role và
-                cấu hình thông tin hệ thống bãi xe.
-              </p>
-              <div class="feat-chip">Admin · RBAC · Phân quyền</div>
+            <article class="benefit-card reveal delay-2">
+              <div class="icon blue">♡</div>
+              <h3>Hỗ trợ thuận tiện</h3>
+              <p>Gửi phản hồi trực tiếp khi cần hỗ trợ về lượt gửi hoặc thông tin phương tiện.</p>
             </article>
           </div>
         </div>
       </section>
 
-      <!-- ══════════════════════ ROLES ══════════════════════ -->
-      <section id="roles" class="section roles-section">
+      <section id="how-it-works" class="section steps-section">
+        <div class="shell steps-layout">
+          <div class="section-heading sticky-heading reveal">
+            <span>CÁCH PARKSMART HOẠT ĐỘNG</span>
+            <h2>Chỉ bốn bước cho một lượt gửi xe</h2>
+            <p>Không cần làm quen với quy trình phức tạp. Bạn có thể sử dụng ngay từ lần đầu.</p>
+          </div>
+          <div class="steps-list">
+            <article class="step reveal"><b>01</b><div><h3>Đăng ký tài khoản</h3><p>Nhập thông tin cơ bản và biển số phương tiện để bắt đầu.</p></div></article>
+            <article class="step reveal"><b>02</b><div><h3>Đặt chỗ trước</h3><p>Chọn loại xe, thời gian dự kiến và gửi yêu cầu đặt chỗ.</p></div></article>
+            <article class="step reveal"><b>03</b><div><h3>Đưa xe đến bãi</h3><p>Xác nhận nhanh bằng biển số và nhận vị trí slot được phân bổ.</p></div></article>
+            <article class="step reveal"><b>04</b><div><h3>Nhận xe và hoàn tất</h3><p>Kiểm tra thời gian, chi phí và lịch sử lượt gửi trong tài khoản.</p></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="safety" class="section safety-section">
+        <div class="shell safety-layout">
+          <div class="safety-copy reveal">
+            <div class="section-heading">
+              <span>AN TÂM TRONG TỪNG LƯỢT GỬI</span>
+              <h2>Thông tin rõ ràng khi bạn cần kiểm tra</h2>
+              <p>Mỗi lượt gửi gắn với biển số, thời gian và vị trí cụ thể để hỗ trợ tra cứu thuận tiện.</p>
+            </div>
+            <ul class="check-list">
+              <li><i>✓</i><span><b>Lịch sử đầy đủ</b><small>Xem lại các lượt gửi đã hoàn thành.</small></span></li>
+              <li><i>✓</i><span><b>Thời gian minh bạch</b><small>Giờ vào và giờ ra được ghi nhận rõ ràng.</small></span></li>
+              <li><i>✓</i><span><b>Kênh phản hồi trực tiếp</b><small>Gửi yêu cầu hỗ trợ ngay trong tài khoản.</small></span></li>
+            </ul>
+          </div>
+
+          <div class="ticket reveal delay-1">
+            <div class="ticket-head">
+              <img src="logo.svg" alt="ParkSmart" />
+              <div><small>LƯỢT GỬI ĐANG HOẠT ĐỘNG</small><strong>51A-12345</strong></div>
+              <span><i></i> Đã xác nhận</span>
+            </div>
+            <div class="ticket-data">
+              <div><small>Vị trí</small><b>A-07 · Tầng 1</b></div>
+              <div><small>Giờ vào</small><b>08:35 hôm nay</b></div>
+              <div><small>Loại xe</small><b>Ô tô</b></div>
+              <div><small>Trạng thái</small><b class="green-text">Đang gửi</b></div>
+            </div>
+            <div class="ticket-note">Thông tin lượt gửi luôn sẵn sàng trong mục “Lượt gửi của tôi”.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section testimonial-section">
         <div class="shell">
-          <div class="sec-head" data-aos="fade-up">
-            <span class="sec-label" style="color: var(--cyan-l)"
-              >4 VAI TRÒ NGƯỜI DÙNG</span
-            >
-            <h2>
-              Mỗi người một giao diện,
-              <span class="g-text">cùng một dữ liệu</span>
-            </h2>
-            <p>
-              Hệ thống phân quyền rõ ràng, mỗi vai trò chỉ thấy và thao tác
-              những gì cần thiết.
-            </p>
+          <div class="section-heading centered reveal">
+            <span>TRẢI NGHIỆM HƯỚNG ĐẾN KHÁCH HÀNG</span>
+            <h2>Ít chờ đợi hơn, chủ động nhiều hơn</h2>
           </div>
-
-          <div class="role-grid">
-            <!-- Manager -->
-            <article class="role-card" data-aos="fade-up" data-aos-delay="0">
-              <div class="role-header">
-                <div class="role-icon" style="--rc: #7c3aed">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect x="3" y="3" width="7" height="7" />
-                    <rect x="14" y="3" width="7" height="7" />
-                    <rect x="3" y="14" width="7" height="7" />
-                    <rect x="14" y="14" width="7" height="7" />
-                  </svg>
-                </div>
-                <span class="role-num">01</span>
-              </div>
-              <h3>Parking Manager</h3>
-              <p>
-                Quản lý tổng thể bãi xe: tổng quan, sơ đồ slot, chính sách giá,
-                báo cáo doanh thu và lưu lượng xe.
-              </p>
-              <ul class="role-perms">
-                <li>Dashboard tổng quan</li>
-                <li>Quản lý slot theo tầng</li>
-                <li>Cấu hình giá vé</li>
-                <li>Báo cáo 7 ngày</li>
-                <li>Quản lý ngoại lệ</li>
-              </ul>
-              <div class="role-cred">
-                <div class="cred-line">
-                  <span>Username</span><code>manager</code>
-                </div>
-                <div class="cred-line">
-                  <span>Password</span><code>bất kỳ</code>
-                </div>
-              </div>
-            </article>
-
-            <!-- Staff -->
-            <article class="role-card" data-aos="fade-up" data-aos-delay="80">
-              <div class="role-header">
-                <div class="role-icon" style="--rc: #06b6d4">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                  </svg>
-                </div>
-                <span class="role-num">02</span>
-              </div>
-              <h3>Staff — Nhân viên</h3>
-              <p>
-                Trực tiếp tại bãi xe: quét biển số, ghi nhận xe vào/ra và xử lý
-                mọi tình huống bất thường nhanh chóng.
-              </p>
-              <ul class="role-perms">
-                <li>Check-in xe</li>
-                <li>Check-out &amp; tính phí</li>
-                <li>Xử lý sự cố / ngoại lệ</li>
-                <li>Tìm xe theo biển số</li>
-              </ul>
-              <div class="role-cred">
-                <div class="cred-line">
-                  <span>Username</span><code>staff1</code>
-                </div>
-                <div class="cred-line">
-                  <span>Password</span><code>bất kỳ</code>
-                </div>
-              </div>
-            </article>
-
-            <!-- Driver -->
-            <article class="role-card" data-aos="fade-up" data-aos-delay="160">
-              <div class="role-header">
-                <div class="role-icon" style="--rc: #10b981">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect x="1" y="3" width="15" height="13" rx="2" />
-                    <path d="M16 8h4l3 3v5h-7V8z" />
-                    <circle cx="5.5" cy="18.5" r="2.5" />
-                    <circle cx="18.5" cy="18.5" r="2.5" />
-                  </svg>
-                </div>
-                <span class="role-num">03</span>
-              </div>
-              <h3>Driver — Người gửi xe</h3>
-              <p>
-                Chủ xe tự quản lý: xem xe đang gửi, lịch sử phiên gửi, đặt chỗ
-                trước và gửi phản hồi dịch vụ.
-              </p>
-              <ul class="role-perms">
-                <li>Xem xe đang gửi</li>
-                <li>Lịch sử + QR phiên</li>
-                <li>Đặt chỗ trước</li>
-                <li>Gửi phản hồi / khiếu nại</li>
-              </ul>
-              <div class="role-cred">
-                <div class="cred-line">
-                  <span>Username</span><code>driver1</code>
-                </div>
-                <div class="cred-line">
-                  <span>Password</span><code>bất kỳ</code>
-                </div>
-              </div>
-            </article>
-
-            <!-- Admin -->
-            <article class="role-card" data-aos="fade-up" data-aos-delay="240">
-              <div class="role-header">
-                <div class="role-icon" style="--rc: #f97316">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  </svg>
-                </div>
-                <span class="role-num">04</span>
-              </div>
-              <h3>Admin — Quản trị viên</h3>
-              <p>
-                Toàn quyền hệ thống: quản lý tài khoản người dùng theo role, cấu
-                hình thông tin và giờ mở/đóng cửa bãi xe.
-              </p>
-              <ul class="role-perms">
-                <li>Thêm / sửa / xóa tài khoản</li>
-                <li>Phân quyền theo role</li>
-                <li>Cấu hình hệ thống</li>
-                <li>Quản lý toàn bộ thông tin</li>
-              </ul>
-              <div class="role-cred">
-                <div class="cred-line">
-                  <span>Username</span><code>admin</code>
-                </div>
-                <div class="cred-line">
-                  <span>Password</span><code>bất kỳ</code>
-                </div>
-              </div>
-            </article>
+          <div class="quote-grid">
+            <blockquote class="reveal"><p>“Tôi có thể kiểm tra chỗ trước khi đến nên không còn mất thời gian chạy tìm quanh bãi.”</p><footer><b>Minh Anh</b><span>Khách gửi xe ô tô</span></footer></blockquote>
+            <blockquote class="reveal delay-1"><p>“Thông tin giờ vào và vị trí xe hiển thị rất rõ, thao tác đặt chỗ cũng đơn giản.”</p><footer><b>Quốc Huy</b><span>Khách gửi xe thường xuyên</span></footer></blockquote>
+            <blockquote class="reveal delay-2"><p>“Khi cần hỗ trợ tôi có thể gửi phản hồi ngay trong ứng dụng thay vì phải tìm nhân viên.”</p><footer><b>Thu Trang</b><span>Khách hàng ParkSmart</span></footer></blockquote>
           </div>
         </div>
       </section>
 
-      <!-- ══════════════════════ WORKFLOW ══════════════════════ -->
-      <section id="workflow" class="section wf-section">
-        <div class="shell">
-          <div class="sec-head" data-aos="fade-up">
-            <span class="sec-label">QUY TRÌNH ĐƠN GIẢN</span>
-            <h2>
-              Từ lúc xe đến cho đến <span class="g-text">khi rời bãi</span>
-            </h2>
-            <p>
-              Mỗi bước trong luồng gửi xe được thiết kế tối giản, nhanh và chính
-              xác.
-            </p>
+      <section id="faq" class="section faq-section">
+        <div class="shell faq-layout">
+          <div class="section-heading reveal">
+            <span>HỎI ĐÁP</span>
+            <h2>Thông tin bạn có thể cần</h2>
+            <p>Một vài câu trả lời nhanh trước khi bạn bắt đầu sử dụng ParkSmart.</p>
           </div>
-
-          <div class="wf-track">
-            <div class="wf-connector"></div>
-            <div class="wf-steps">
-              <div class="wf-step" data-aos="fade-up" data-aos-delay="0">
-                <div class="wf-circle">
-                  <span>1</span>
-                </div>
-                <div class="wf-card">
-                  <h3>Nhận diện xe</h3>
-                  <p>
-                    Nhân viên nhập biển số, chọn loại xe (xe máy / ô tô / xe
-                    tải). Hệ thống xác nhận thông tin.
-                  </p>
-                  <div class="wf-tags">
-                    <span>Xe máy</span><span>Ô tô</span><span>Xe tải</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="wf-step" data-aos="fade-up" data-aos-delay="80">
-                <div class="wf-circle">
-                  <span>2</span>
-                </div>
-                <div class="wf-card">
-                  <h3>Phân bổ slot</h3>
-                  <p>
-                    Hệ thống tự tìm ô đỗ phù hợp theo loại xe và tầng, đánh dấu
-                    slot đang dùng ngay lập tức.
-                  </p>
-                  <div class="wf-tags">
-                    <span>T1-T2: xe máy</span><span>T3-T4: ô tô</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="wf-step" data-aos="fade-up" data-aos-delay="160">
-                <div class="wf-circle">
-                  <span>3</span>
-                </div>
-                <div class="wf-card">
-                  <h3>Theo dõi phiên gửi</h3>
-                  <p>
-                    Thời gian check-in, trạng thái slot và thông tin xe được cập
-                    nhật liên tục trong suốt thời gian gửi.
-                  </p>
-                  <div class="wf-tags">
-                    <span>QR code</span><span>Real-time</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="wf-step" data-aos="fade-up" data-aos-delay="240">
-                <div class="wf-circle">
-                  <span>4</span>
-                </div>
-                <div class="wf-card">
-                  <h3>Check-out &amp; Thanh toán</h3>
-                  <p>
-                    Tính phí tự động theo thời gian và chính sách giá. Slot trở
-                    về trạng thái trống, thống kê cập nhật.
-                  </p>
-                  <div class="wf-tags">
-                    <span>Theo giờ</span><span>Qua đêm</span
-                    ><span>Theo tháng</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="accordion reveal delay-1">
+            <details open><summary>Tôi có cần đặt chỗ trước không?</summary><p>Không bắt buộc. Đặt trước giúp bạn chủ động hơn khi bãi có lưu lượng cao.</p></details>
+            <details><summary>Tôi xem vị trí xe ở đâu?</summary><p>Vị trí tầng và mã slot được hiển thị trong mục “Lượt gửi của tôi”.</p></details>
+            <details><summary>Ứng dụng hỗ trợ những loại xe nào?</summary><p>Hệ thống hỗ trợ xe máy, ô tô và xe tải theo khu vực được bãi xe cấu hình.</p></details>
+            <details><summary>Nếu thông tin biển số không đúng thì sao?</summary><p>Bạn có thể gửi phản hồi hoặc liên hệ nhân viên bãi xe để được xác minh và hỗ trợ.</p></details>
           </div>
         </div>
       </section>
 
-      <!-- ══════════════════════ DEMO ══════════════════════ -->
-      <section id="demo" class="section demo-section">
-        <div class="shell">
-          <div class="sec-head" data-aos="fade-up">
-            <span class="sec-label" style="color: var(--cyan-l)">THỬ NGAY</span>
-            <h2>Tài khoản demo <span class="g-text">sẵn sàng</span></h2>
-            <p>
-              Đăng nhập bằng bất kỳ tài khoản nào bên dưới. Mật khẩu có thể nhập
-              bất kỳ ký tự nào.
-            </p>
-          </div>
-
-          <div class="demo-accounts" data-aos="fade-up" data-aos-delay="100">
-            <div class="demo-table-wrap">
-              <table class="demo-table">
-                <thead>
-                  <tr>
-                    <th>Vai trò</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Truy cập</th>
-                    <th>Tính năng chính</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><span class="role-badge purple">Manager</span></td>
-                    <td><code>manager</code></td>
-                    <td><code>bất kỳ</code></td>
-                    <td><code>/manager</code></td>
-                    <td>Dashboard, slot, giá vé, báo cáo</td>
-                  </tr>
-                  <tr>
-                    <td><span class="role-badge cyan">Staff</span></td>
-                    <td><code>staff1</code> / <code>staff2</code></td>
-                    <td><code>bất kỳ</code></td>
-                    <td><code>/staff</code></td>
-                    <td>Check-in, check-out, xử lý sự cố</td>
-                  </tr>
-                  <tr>
-                    <td><span class="role-badge green">Driver</span></td>
-                    <td><code>driver1</code> / <code>driver2</code></td>
-                    <td><code>bất kỳ</code></td>
-                    <td><code>/driver</code></td>
-                    <td>Đặt chỗ, lịch sử, phản hồi</td>
-                  </tr>
-                  <tr>
-                    <td><span class="role-badge orange">Admin</span></td>
-                    <td><code>admin</code></td>
-                    <td><code>bất kỳ</code></td>
-                    <td><code>/admin</code></td>
-                    <td>Quản lý tài khoản, cấu hình hệ thống</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="demo-notice">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <span
-                >Dữ liệu demo được tạo ngẫu nhiên mỗi khi khởi động app. Đây là
-                prototype không kết nối backend thật — dữ liệu sẽ mất sau khi
-                reload.</span
-              >
-            </div>
-          </div>
+      <section id="get-started" class="cta-section">
+        <div class="shell cta reveal">
+          <img src="logo.svg" alt="Logo ParkSmart" />
+          <div><span>PARKSMART SWP08</span><h2>Chủ động chỗ đậu cho hành trình tiếp theo.</h2><p>Đăng ký tài khoản và trải nghiệm quy trình gửi xe đơn giản hơn.</p></div>
+          <a class="button primary" href="#top">Khám phá ParkSmart</a>
         </div>
       </section>
-
-      <!-- ══════════════════════ TECH ══════════════════════ -->
-      <section id="tech" class="section tech-section">
-        <div class="shell">
-          <div class="sec-head" data-aos="fade-up">
-            <span class="sec-label">CÔNG NGHỆ</span>
-            <h2>
-              Xây dựng bằng <span class="g-text">Flutter &amp; Dart</span>
-            </h2>
-            <p>
-              Stack hiện đại, cross-platform — chạy được trên Web, Desktop và
-              Mobile từ cùng một codebase.
-            </p>
-          </div>
-
-          <div class="tech-layout">
-            <!-- Stack list -->
-            <div class="stack-list" data-aos="fade-up" data-aos-delay="0">
-              <div class="stack-item">
-                <div class="stack-dot" style="background: #54c5f8"></div>
-                <div>
-                  <strong>Flutter 3</strong>
-                  <span
-                    >Framework UI đa nền tảng của Google — Web, Desktop,
-                    Mobile</span
-                  >
-                </div>
-              </div>
-              <div class="stack-item">
-                <div class="stack-dot" style="background: #a78bfa"></div>
-                <div>
-                  <strong>go_router ^14.0</strong>
-                  <span
-                    >URL-based navigation, web-friendly routing, deep-link
-                    support</span
-                  >
-                </div>
-              </div>
-              <div class="stack-item">
-                <div class="stack-dot" style="background: #67e8f9"></div>
-                <div>
-                  <strong>provider ^6.1</strong>
-                  <span
-                    >State management — ChangeNotifier pattern toàn cục</span
-                  >
-                </div>
-              </div>
-              <div class="stack-item">
-                <div class="stack-dot" style="background: #6ee7b7"></div>
-                <div>
-                  <strong>fl_chart ^0.69</strong>
-                  <span
-                    >Biểu đồ doanh thu, lưu lượng xe (line chart &amp; bar
-                    chart)</span
-                  >
-                </div>
-              </div>
-              <div class="stack-item">
-                <div class="stack-dot" style="background: #fdba74"></div>
-                <div>
-                  <strong>qr_flutter ^4.1</strong>
-                  <span>Sinh mã QR cho phiên gửi xe và đặt chỗ trước</span>
-                </div>
-              </div>
-              <div class="stack-item">
-                <div class="stack-dot" style="background: #f9a8d4"></div>
-                <div>
-                  <strong>flutter_animate ^4.5</strong>
-                  <span
-                    >Micro-animations: fade-in, slide, bounce, scale
-                    effects</span
-                  >
-                </div>
-              </div>
-              <div class="stack-item">
-                <div class="stack-dot" style="background: #93c5fd"></div>
-                <div>
-                  <strong>google_fonts + intl</strong>
-                  <span>Font Inter + định dạng ngày giờ tiếng Việt</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Arch diagram -->
-            <div class="arch-diagram" data-aos="fade-up" data-aos-delay="150">
-              <div class="arch-title">Kiến trúc 3 tầng</div>
-              <div class="arch-layers">
-                <div class="arch-layer layer-ui">
-                  <div class="layer-icon">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <rect x="2" y="3" width="20" height="14" rx="2" />
-                      <line x1="8" y1="21" x2="16" y2="21" />
-                      <line x1="12" y1="17" x2="12" y2="21" />
-                    </svg>
-                  </div>
-                  <div class="layer-info">
-                    <strong>Features (UI Layer)</strong>
-                    <span>Screens, Widgets, Shells</span>
-                  </div>
-                </div>
-                <div class="arch-arrow">↕</div>
-                <div class="arch-layer layer-svc">
-                  <div class="layer-icon">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <circle cx="12" cy="12" r="3" />
-                      <path
-                        d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"
-                      />
-                    </svg>
-                  </div>
-                  <div class="layer-info">
-                    <strong>MockDataService (Provider)</strong>
-                    <span>Business logic · State · Notifier</span>
-                  </div>
-                </div>
-                <div class="arch-arrow">↕</div>
-                <div class="arch-layer layer-model">
-                  <div class="layer-icon">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <ellipse cx="12" cy="5" rx="9" ry="3" />
-                      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-                      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-                    </svg>
-                  </div>
-                  <div class="layer-info">
-                    <strong>Models (Dart)</strong>
-                    <span>User · Slot · Session · ParkingSession</span>
-                  </div>
-                </div>
-              </div>
-              <p class="arch-note">
-                MockDataService đóng vai trò "backend giả" — dễ thay bằng REST
-                API thật khi cần.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══════════════════════ ABOUT ══════════════════════ -->
-      <section id="about" class="section about-section">
-        <div class="shell">
-          <div class="about-grid">
-            <div class="about-copy" data-aos="fade-up">
-              <span class="sec-label" style="color: var(--cyan-l)"
-                >VỀ DỰ ÁN</span
-              >
-              <h2>Đồ án <span class="g-text">SU26SWP08</span></h2>
-              <p>
-                Được phát triển như một đồ án môn học Software Practice — SU26
-                với stack Flutter/Dart, kiến trúc phân tầng rõ ràng và giao diện
-                dark mode hiện đại.
-              </p>
-              <div class="about-meta">
-                <div class="meta-item">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"
-                    />
-                  </svg>
-                  <span>SU26SWP08 — Parking Building Management System</span>
-                </div>
-                <div class="meta-item">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="16,18 22,12 16,6" />
-                    <polyline points="8,6 2,12 8,18" />
-                  </svg>
-                  <span
-                    >Flutter 3 · Dart · Provider · GoRouter · fl_chart ·
-                    qr_flutter</span
-                  >
-                </div>
-                <div class="meta-item">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect x="2" y="3" width="20" height="14" rx="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                  </svg>
-                  <span>Web · Desktop · từ một codebase Dart duy nhất</span>
-                </div>
-              </div>
-            </div>
-            <div class="about-status" data-aos="fade-up" data-aos-delay="150">
-              <div class="status-card">
-                <div class="status-dot"></div>
-                <div>
-                  <strong>Prototype hoàn chỉnh</strong>
-                  <p>
-                    MockData sẵn sàng demo, thiết kế sẵn sàng tích hợp API thật.
-                  </p>
-                </div>
-              </div>
-              <div class="status-stats">
-                <div class="ss-item">
-                  <strong>7+</strong>
-                  <span>Màn hình</span>
-                </div>
-                <div class="ss-item">
-                  <strong>190</strong>
-                  <span>Slot xe</span>
-                </div>
-                <div class="ss-item">
-                  <strong>4</strong>
-                  <span>Role người dùng</span>
-                </div>
-                <div class="ss-item">
-                  <strong>100%</strong>
-                  <span>Flutter Widget</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
     </main>
 
-    <!-- ══════════════════════ FOOTER ══════════════════════ -->
     <footer class="site-footer">
-      <div class="shell footer-inner">
-        <div class="footer-brand">
-          <img class="brand-logo sm" src="logo.svg" alt="Logo ParkSmart" />
-          <span><strong>ParkSmart</strong> SWP08</span>
-        </div>
-        <span class="footer-copy"
-          >© 2026 SU26SWP08 — Parking Building Management System</span
-        >
-        <span class="footer-built">Built with Flutter &amp; Dart</span>
+      <div class="shell footer-wrap">
+        <a class="brand" href="#top"><img src="logo.svg" alt="ParkSmart" /><span><strong>ParkSmart</strong><small>SWP08</small></span></a>
+        <p>Trải nghiệm gửi xe thông minh dành cho khách hàng.</p>
+        <span>© 2026 ParkSmart SWP08</span>
       </div>
     </footer>
 
     <script>
-      // ─── Mobile drawer ───────────────────────────────────
-      const menuBtn = document.getElementById("menuBtn");
-      const mobileDrawer = document.getElementById("mobileDrawer");
-      menuBtn.addEventListener("click", () => {
-        mobileDrawer.classList.toggle("open");
-        menuBtn.classList.toggle("active");
+      const menuButton = document.getElementById('menuButton');
+      const mobileNav = document.getElementById('mobileNav');
+      menuButton.addEventListener('click', () => {
+        const open = mobileNav.classList.toggle('open');
+        menuButton.setAttribute('aria-expanded', String(open));
       });
-      function closeDrawer() {
-        mobileDrawer.classList.remove("open");
-        menuBtn.classList.remove("active");
-      }
+      mobileNav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+        mobileNav.classList.remove('open');
+        menuButton.setAttribute('aria-expanded', 'false');
+      }));
 
-      // ─── Navbar scroll glass ─────────────────────────────
-      const navbar = document.getElementById("navbar");
-      window.addEventListener("scroll", () => {
-        navbar.classList.toggle("scrolled", window.scrollY > 40);
-      });
-
-      // ─── AOS-like scroll animation ───────────────────────
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const delay = entry.target.dataset.aosDelay || 0;
-              setTimeout(
-                () => entry.target.classList.add("aos-in"),
-                parseInt(delay),
-              );
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.1 },
-      );
-
-      document
-        .querySelectorAll("[data-aos]")
-        .forEach((el) => observer.observe(el));
-
-      // ─── Slot grid generator ─────────────────────────────
-      const slots = [];
-      const labels = ["A", "B", "C", "D"];
-      const types = [
-        "free",
-        "busy",
-        "rsv",
-        "free",
-        "free",
-        "busy",
-        "free",
-        "rsv",
-        "free",
-        "busy",
-        "free",
-        "free",
-        "free",
-        "busy",
-        "free",
-        "free",
-        "free",
-        "free",
-        "busy",
-        "rsv",
-      ];
-      labels.forEach((l) => {
-        for (let i = 1; i <= 5; i++)
-          slots.push({
-            id: `${l}0${i}`,
-            type: types[slots.length % types.length],
-          });
-      });
-      const grid = document.getElementById("slotGrid");
-      slots.forEach((s, i) => {
-        const el = document.createElement("div");
-        el.className = `slot ${s.type}`;
-        el.textContent = s.id;
-        el.style.animationDelay = i * 0.04 + "s";
-        grid.appendChild(el);
-      });
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
     </script>
   </body>
 </html>
