@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +8,7 @@ import '../../core/services/mock_data_service.dart';
 import '../../shared/utils/responsive.dart';
 import '../../shared/utils/remember_login_storage.dart';
 import '../../shared/widgets/parking_brand_logo.dart';
+import '../../shared/widgets/image_captcha_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,19 +24,16 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _confirmPasswordCtrl = TextEditingController();
-  final _captchaCtrl = TextEditingController();
   bool _loading = false;
   bool _obscure = true;
   bool _registerMode = false;
   bool _rememberLogin = false;
-  int _captchaLeft = 0;
-  int _captchaRight = 0;
+  bool _captchaVerified = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    _refreshCaptcha(notify: false);
     _loadRememberedUsername();
   }
 
@@ -48,7 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
     _confirmPasswordCtrl.dispose();
-    _captchaCtrl.dispose();
     super.dispose();
   }
 
@@ -61,24 +57,11 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void _refreshCaptcha({bool notify = true}) {
-    final random = Random();
-    final update = () {
-      _captchaLeft = random.nextInt(8) + 2;
-      _captchaRight = random.nextInt(8) + 1;
-      _captchaCtrl.clear();
-    };
-    if (notify && mounted) {
-      setState(update);
-    } else {
-      update();
-    }
-  }
-
   void _setMode(bool registerMode) {
     setState(() {
       _registerMode = registerMode;
       _error = null;
+      _captchaVerified = false;
     });
   }
 
@@ -148,10 +131,8 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _error = 'Mật khẩu xác nhận không khớp.');
       return;
     }
-    final captchaAnswer = int.tryParse(_captchaCtrl.text.trim());
-    if (captchaAnswer != _captchaLeft + _captchaRight) {
-      setState(() => _error = 'Mã CAPTCHA chưa đúng. Vui lòng thử lại.');
-      _refreshCaptcha();
+    if (!_captchaVerified) {
+      setState(() => _error = 'Vui lòng hoàn thành xác minh CAPTCHA.');
       return;
     }
 
@@ -172,8 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _loading = false;
         _error = 'Tên đăng nhập đã tồn tại.';
+        _captchaVerified = false;
       });
-      _refreshCaptcha();
       return;
     }
 
@@ -287,8 +268,8 @@ class _LoginScreenState extends State<LoginScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primary.withOpacity(0.15),
-            AppColors.accent.withOpacity(0.05),
+            AppColors.primary.withValues(alpha: 0.15),
+            AppColors.accent.withValues(alpha: 0.05),
           ],
         ),
         border: const Border(
@@ -338,7 +319,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.15),
+                        color: AppColors.primary.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(e.value.$1,
@@ -364,63 +345,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildCaptcha() {
-    return SizedBox(
-      height: 60,
-      child: Row(
-        children: [
-          Container(
-            width: 150,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primary.withValues(alpha: 0.22),
-                  AppColors.accent.withValues(alpha: 0.12),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderLight),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '$_captchaLeft + $_captchaRight = ?',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Đổi CAPTCHA',
-                  onPressed: _refreshCaptcha,
-                  icon: const Icon(Icons.refresh_rounded,
-                      color: AppColors.accent, size: 19),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              controller: _captchaCtrl,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(color: AppColors.textPrimary),
-              decoration: const InputDecoration(
-                labelText: 'Kết quả CAPTCHA',
-                prefixIcon: Icon(Icons.verified_user_outlined,
-                    color: AppColors.textSecondary),
-              ),
-              onSubmitted: (_) => _register(),
-            ),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(delay: 420.ms);
+    return ImageCaptchaWidget(
+      onVerified: () {
+        if (mounted) setState(() => _captchaVerified = true);
+      },
+    );
   }
 
   Widget _buildLoginForm(bool isMobile) {
@@ -589,9 +518,9 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.1),
+              color: Colors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red.withOpacity(0.3)),
+              border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [

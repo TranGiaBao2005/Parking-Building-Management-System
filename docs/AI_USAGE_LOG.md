@@ -78,6 +78,106 @@ Mục đích:
 
 ## Log History
 
+## [2026-06-25 21:18:00] - Redesign CAPTCHA thành dạng checkbox "Tôi không phải robot"
+
+| Field                      | Content                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | Antigravity AI / Claude Sonnet 4.6                                                                                              |
+| Support Type               | UI update / Widget redesign                                                                                                     |
+| Estimated AI Support       | 95% AI implementation, 5% developer review                                                                                      |
+| Human Reviewer             | Trần Gia Bảo                                                                                                                    |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+> "tui mún Captcha kiểu ô tích và chữ kế bên ô tích là tôi không phải robot, ấn tích xong thì hiện 1 bảng nhỏ làm bài kiểm tra tích ô"
+
+### AI Assistance Summary
+
+- Viết lại toàn bộ `ImageCaptchaWidget` trong `lib/shared/widgets/image_captcha_widget.dart`.
+- Flow mới: hiện ô checkbox + text "Tôi không phải robot" + logo reCAPTCHA → click ô → mở Dialog 3×3 → nhấn "Xác nhận" → spinner "verifying" → checkbox tick xanh.
+- Dialog có nút "Bỏ qua" (hủy) và "Xác nhận" (luôn pass – mock).
+- Fix tất cả warning: `withOpacity` → `withValues(alpha:)`, thêm `const` cho các constructor.
+
+### Files Created / Modified / Deleted
+
+| File                                           | Action   | Summary                                          |
+| ---------------------------------------------- | -------- | ------------------------------------------------ |
+| `lib/shared/widgets/image_captcha_widget.dart` | Modified | Viết lại hoàn toàn sang kiểu checkbox + dialog  |
+| `docs/AI_USAGE_LOG.md`                         | Modified | Thêm log entry này                               |
+
+### Commands Run & Results
+
+| Command                   | Result  |
+| ------------------------- | ------- |
+| `flutter analyze`         | Pending |
+| `flutter run -d chrome`   | Running |
+
+### Git Status Summary
+
+Chưa commit. Developer cần review và test thủ công.
+
+### Developer Review Notes
+
+- Test click ô checkbox → dialog có mở không.
+- Test nhấn "Xác nhận" → checkbox tick xanh có xuất hiện không.
+- Test nhấn "Bỏ qua" → dialog đóng, checkbox vẫn chưa tích.
+- Test form đăng ký submit khi chưa tích CAPTCHA → có báo lỗi không.
+
+---
+
+## [2026-06-25 21:05:00] - Thay CAPTCHA phép toán bằng CAPTCHA hình ảnh (Mock UI)
+
+| Field                      | Content                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | Antigravity AI / Claude Sonnet 4.6                                                                                              |
+| Support Type               | UI update / Frontend feature / Widget creation                                                                                  |
+| Estimated AI Support       | 95% AI implementation, 5% developer review                                                                                      |
+| Human Reviewer             | Trần Gia Bảo                                                                                                                    |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+> "Thế làm cái CAPTCHA ở Frontend (như việc hiển thị bảng chọn ảnh đèn giao thông, vạch kẻ đường...), chỉ để xem mẫu thôi, chọn đúng hay sai thì vẫn tính đúng thì được ko?"
+
+### AI Assistance Summary
+
+- Tạo widget `ImageCaptchaWidget` trong `lib/shared/widgets/image_captcha_widget.dart` với giao diện lưới 3×3 ô hình ảnh mô phỏng Google reCAPTCHA.
+- Widget hiển thị 5 loại danh mục ngẫu nhiên: đèn giao thông, xe hơi, xe máy, biển báo, bãi đỗ xe.
+- Sử dụng `CustomPaint` để vẽ nền "noise" giả lập ảnh thực, Icon + màu sắc để đại diện cho các đối tượng.
+- Nút "Xác nhận" luôn pass (mock) – không có validation thực sự, phù hợp mục đích demo.
+- Nút "Tải ảnh mới" để refresh ngẫu nhiên danh mục và nội dung các ô.
+- Hiển thị badge "Đã xác minh" màu xanh sau khi xác nhận.
+- Cập nhật `login_screen.dart`: xóa captcha phép toán cũ, import widget mới, thêm state `_captchaVerified`, reset captcha khi chuyển mode.
+
+### Files Created / Modified / Deleted
+
+| File                                                    | Action   | Summary                                             |
+| ------------------------------------------------------- | -------- | --------------------------------------------------- |
+| `lib/shared/widgets/image_captcha_widget.dart`          | Created  | Widget CAPTCHA hình ảnh 3×3 dạng mock, luôn pass   |
+| `lib/features/auth/login_screen.dart`                   | Modified | Thay captcha phép toán bằng ImageCaptchaWidget      |
+| `docs/AI_USAGE_LOG.md`                                  | Modified | Thêm log entry này                                  |
+
+### Commands Run & Results
+
+| Command                                                                               | Result      |
+| ------------------------------------------------------------------------------------- | ----------- |
+| `flutter analyze lib/features/auth/login_screen.dart lib/shared/widgets/image_captcha_widget.dart` | Pending     |
+| `flutter run -d chrome`                                                               | Running     |
+
+### Git Status Summary
+
+Chưa commit. Developer cần review và test thủ công trước khi commit.
+
+### Developer Review Notes
+
+- Kiểm tra form đăng ký: CAPTCHA hiển thị đúng chưa, nút "Xác nhận" có pass không.
+- Kiểm tra lại khi chuyển từ Đăng nhập → Đăng ký, captcha có reset không.
+- Kiểm tra khi click "Tải ảnh mới", danh mục có đổi ngẫu nhiên không.
+- **Lưu ý bảo mật**: Widget này chỉ dành cho demo/mockup. Khi tích hợp thực tế cần backend để verify token từ nhà cung cấp CAPTCHA (Google reCAPTCHA, hCaptcha, Cloudflare Turnstile...).
+
+---
+
 ## [2026-06-21 21:43:37] - Chuyển CAPTCHA từ đăng nhập sang đăng ký
 
 | Field                      | Content                                                                                                              |
