@@ -3,26 +3,28 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Primary
-  static const primary = Color(0xFF6366F1);       // Indigo 500
-  static const primaryDark = Color(0xFF4F46E5);   // Indigo 600
-  static const primaryLight = Color(0xFF818CF8);  // Indigo 400
+  static const primary = Color(0xFF6366F1); // Indigo 500
+  static const primaryDark = Color(0xFF4F46E5); // Indigo 600
+  static const primaryLight = Color(0xFF818CF8); // Indigo 400
 
   // Accent
-  static const accent = Color(0xFF06B6D4);        // Cyan 500
-  static const accentDark = Color(0xFF0891B2);    // Cyan 600
+  static const accent = Color(0xFF06B6D4); // Cyan 500
+  static const accentDark = Color(0xFF0891B2); // Cyan 600
 
   // Background
-  static const bg = Color(0xFF0F172A);            // Slate 900
-  static const surface = Color(0xFF1E293B);       // Slate 800
-  static const surfaceLight = Color(0xFF334155);  // Slate 700
+  static const bg = Color(0xFF0F172A); // Slate 900
+  static const surface = Color(0xFF1E293B); // Slate 800
+  static const surfaceLight = Color(0xFF334155); // Slate 700
   static const card = Color(0xFF1E293B);
 
   // Status
-  static const available = Color(0xFF10B981);     // Emerald 500
-  static const occupied = Color(0xFFEF4444);      // Red 500
-  static const reserved = Color(0xFFF59E0B);      // Amber 500
-  static const maintenance = Color(0xFF6B7280);   // Gray 500
-  static const locked = Color(0xFFEC4899);        // Pink 500
+  static const available = Color(0xFF10B981); // Emerald 500
+  static const slotAvailable = Color(0xFF94A3B8); // Slate 400
+  static const occupied = Color(0xFFEF4444); // Red 500
+  static const reserved = Color(0xFFF97316); // Orange 500
+  static const aiManaged = Color(0xFFE11D48); // Rose 600
+  static const maintenance = Color(0xFF6B7280); // Gray 500
+  static const locked = Color(0xFFEC4899); // Pink 500
 
   // Text
   static const textPrimary = Color(0xFFF1F5F9);

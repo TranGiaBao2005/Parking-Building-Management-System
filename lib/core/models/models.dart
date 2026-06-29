@@ -8,3 +8,4 @@ export 'package:parking_management/core/models/vehicle.dart';
 export 'package:parking_management/core/models/feedback_report.dart';
 export 'package:parking_management/core/models/prebooking.dart';
 export 'package:parking_management/core/models/ai_recommendation.dart';
+export 'package:parking_management/core/models/parking_zone.dart';
