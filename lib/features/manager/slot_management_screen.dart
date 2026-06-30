@@ -63,29 +63,10 @@ class _SlotManagementScreenState extends State<SlotManagementScreen> {
               svc: svc,
             ),
             const SizedBox(height: 16),
-            _ViewSwitcher(
-              selected: _viewMode,
-              onChanged: (mode) => setState(() => _viewMode = mode),
-            ),
-            const SizedBox(height: 16),
             Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
-                child: _viewMode == ParkingViewMode.byZone
-                    ? _ZoneView(
-                        key: ValueKey('zone-$_selectedFloorId'),
-                        floorId: _selectedFloorId,
-                      )
-                    : _SlotView(
-                        key: ValueKey(
-                          'slot-$_selectedFloorId-${_filterStatus?.name ?? 'all'}',
-                        ),
-                        floorId: _selectedFloorId,
-                        filterStatus: _filterStatus,
-                        onFilterChanged: (status) {
-                          setState(() => _filterStatus = status);
-                        },
-                      ),
+              child: _ZoneView(
+                key: ValueKey('zone-$_selectedFloorId'),
+                floorId: _selectedFloorId,
               ),
             ),
           ],
@@ -265,6 +246,14 @@ class _ZoneView extends StatelessWidget {
             slotBasedCapacity: svc.slotBasedCapacityForFloor(floorId),
           ),
           const SizedBox(height: 18),
+          _ZoneHeroCard(
+            floorName: _displayFloorName(
+              svc.floors.firstWhere((floor) => floor.id == floorId),
+            ),
+            groupCount: groups.length,
+            hasAiSuggestion: suggestions.isNotEmpty,
+          ),
+          const SizedBox(height: 18),
           ...groups.asMap().entries.map((entry) {
             return Padding(
               padding: EdgeInsets.only(
@@ -317,13 +306,13 @@ class _ZoneView extends StatelessWidget {
   String _displayFloorName(ParkingFloor floor) {
     switch (floor.id) {
       case 'f1':
-        return 'Tầng 1 (Xe máy)';
+        return 'Tầng 1';
       case 'f2':
-        return 'Tầng 2 (Xe máy + xe hơi)';
+        return 'Tầng 2';
       case 'f3':
-        return 'Tầng 3 (Xe hơi)';
+        return 'Tầng 3';
       case 'f4':
-        return 'Tầng 4 (Xe hơi + xe tải)';
+        return 'Tầng 4';
       default:
         return floor.name;
     }
@@ -371,6 +360,113 @@ class _ZoneSummaryCard extends StatelessWidget {
                 color: AppColors.aiManaged,
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ZoneHeroCard extends StatelessWidget {
+  final String floorName;
+  final int groupCount;
+  final bool hasAiSuggestion;
+
+  const _ZoneHeroCard({
+    required this.floorName,
+    required this.groupCount,
+    required this.hasAiSuggestion,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary.withOpacity(0.16),
+            AppColors.accent.withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+      ),
+      child: Wrap(
+        spacing: 14,
+        runSpacing: 14,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                floorName,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                hasAiSuggestion
+                    ? 'Tầng này đang có gợi ý sắp xếp thêm để manager xem nhanh.'
+                    : 'Manager theo dõi trực tiếp theo từng nhóm xe và các dãy bên dưới.',
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+          _HeroInfoPill(
+            icon: Icons.layers_outlined,
+            label: '$groupCount nhóm xe',
+            color: AppColors.primary,
+          ),
+          _HeroInfoPill(
+            icon: Icons.auto_awesome_rounded,
+            label: hasAiSuggestion ? 'Có gợi ý AI' : 'Ổn định',
+            color: hasAiSuggestion ? AppColors.aiManaged : AppColors.available,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroInfoPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _HeroInfoPill({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 18),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -1313,13 +1409,13 @@ class _FloorTabs extends StatelessWidget {
   String _displayFloorName(ParkingFloor floor) {
     switch (floor.id) {
       case 'f1':
-        return 'Tầng 1 (Xe máy)';
+        return 'Tầng 1';
       case 'f2':
-        return 'Tầng 2 (Xe máy + xe hơi)';
+        return 'Tầng 2';
       case 'f3':
-        return 'Tầng 3 (Xe hơi)';
+        return 'Tầng 3';
       case 'f4':
-        return 'Tầng 4 (Xe hơi + xe tải)';
+        return 'Tầng 4';
       default:
         return floor.name;
     }
