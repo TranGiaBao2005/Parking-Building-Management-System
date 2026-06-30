@@ -247,7 +247,7 @@ class _ZoneView extends StatelessWidget {
   Widget build(BuildContext context) {
     final svc = context.watch<MockDataService>();
     final zones = svc.zonesForFloor(floorId);
-    final groups = _buildVehicleGroups(svc, zones);
+    final groups = _buildVehicleGroups(zones);
     final suggestions = svc.flexibleZoneSuggestionsForFloor(floorId);
 
     return SingleChildScrollView(
@@ -278,10 +278,7 @@ class _ZoneView extends StatelessWidget {
     );
   }
 
-  List<_VehicleGroupData> _buildVehicleGroups(
-    MockDataService svc,
-    List<ParkingZone> zones,
-  ) {
+  List<_VehicleGroupData> _buildVehicleGroups(List<ParkingZone> zones) {
     final grouped = <VehicleType, List<ParkingZone>>{};
 
     for (final zone in zones) {
@@ -303,21 +300,11 @@ class _ZoneView extends StatelessWidget {
       final aiChanged = aiZones.any(
         (zone) => zone.currentMode != zone.defaultMode,
       );
-      final floorId = bucket.first.floorId;
-      final bookedCount = svc
-          .slotsForFloor(floorId)
-          .where(
-            (slot) =>
-                slot.allowedType == type && slot.status == SlotStatus.reserved,
-          )
-          .length;
-
       return _VehicleGroupData(
         vehicleType: type,
         rows: rows,
         hasAi: aiZones.isNotEmpty,
         aiChanged: aiChanged,
-        bookedCount: bookedCount,
         status: aiZones.isNotEmpty
             ? (aiChanged
                 ? FlexibleZoneStatus.readyToSwitch
@@ -427,7 +414,7 @@ class _ZoneStatsRow extends StatelessWidget {
         label: 'Sức chứa đang dùng',
         value: '$activeOccupied / $activeCapacity',
         helper: 'Tổng số chỗ đang dùng',
-        color: AppColors.occupied,
+        color: AppColors.available,
       ),
       _ZoneStatData(
         label: 'Chỗ xe máy',
@@ -534,7 +521,6 @@ class _VehicleGroupData {
   final List<ParkingZoneRow> rows;
   final bool hasAi;
   final bool aiChanged;
-  final int bookedCount;
   final FlexibleZoneStatus status;
 
   const _VehicleGroupData({
@@ -542,7 +528,6 @@ class _VehicleGroupData {
     required this.rows,
     required this.hasAi,
     required this.aiChanged,
-    required this.bookedCount,
     required this.status,
   });
 
@@ -582,7 +567,6 @@ class _VehicleGroupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _vehicleColor(group.vehicleType);
     final rate = group.capacity == 0 ? 0.0 : group.occupied / group.capacity;
-    final hasBooking = group.bookedCount > 0;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -609,12 +593,6 @@ class _VehicleGroupCard extends StatelessWidget {
                 text: _vehicleTitle(group.vehicleType),
                 color: color,
               ),
-              if (hasBooking)
-                _InfoChip(
-                  icon: Icons.bookmark_added_rounded,
-                  text: 'Đã book',
-                  color: AppColors.reserved,
-                ),
               if (group.hasAi)
                 _InfoChip(
                   icon: Icons.auto_awesome_rounded,
@@ -718,14 +696,7 @@ class _VehicleGroupCard extends StatelessWidget {
   }
 
   Color _vehicleColor(VehicleType type) {
-    switch (type) {
-      case VehicleType.motorbike:
-        return AppColors.available;
-      case VehicleType.car:
-        return AppColors.primaryLight;
-      case VehicleType.truck:
-        return AppColors.reserved;
-    }
+    return AppColors.available;
   }
 }
 
@@ -892,14 +863,7 @@ class _ZoneCard extends StatelessWidget {
   }
 
   Color _vehicleColor(VehicleType type) {
-    switch (type) {
-      case VehicleType.motorbike:
-        return AppColors.available;
-      case VehicleType.car:
-        return AppColors.primaryLight;
-      case VehicleType.truck:
-        return AppColors.reserved;
-    }
+    return AppColors.available;
   }
 
   String _flexibleHelp(FlexibleZoneStatus status) {
@@ -1121,12 +1085,12 @@ class _SlotWrap extends StatelessWidget {
         final fillColor = reserved
             ? AppColors.reserved
             : occupied
-                ? AppColors.occupied
+                ? AppColors.available
                 : AppColors.slotAvailable;
         final bgColor = reserved
             ? AppColors.reserved.withOpacity(0.18)
             : occupied
-                ? AppColors.occupied.withOpacity(0.16)
+                ? AppColors.available.withOpacity(0.16)
                 : Colors.transparent;
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -1237,7 +1201,7 @@ class _Legend extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       (AppColors.slotAvailable, 'Trống'),
-      (AppColors.occupied, 'Đang dùng'),
+      (AppColors.available, 'Đang dùng'),
       (AppColors.reserved, 'Đặt trước'),
       (AppColors.maintenance, 'Bảo trì'),
       (AppColors.locked, 'Tạm khóa'),
@@ -1373,7 +1337,7 @@ class _FilterRow extends StatelessWidget {
     final filters = [
       (null, 'Tất cả', AppColors.textSecondary),
       (SlotStatus.available, 'Trống', AppColors.slotAvailable),
-      (SlotStatus.occupied, 'Đang dùng', AppColors.occupied),
+      (SlotStatus.occupied, 'Đang dùng', AppColors.available),
       (SlotStatus.reserved, 'Đặt trước', AppColors.reserved),
       (SlotStatus.maintenance, 'Bảo trì', AppColors.maintenance),
       (SlotStatus.locked, 'Tạm khóa', AppColors.locked),
@@ -1480,7 +1444,7 @@ class _SlotTileState extends State<_SlotTile> {
       case SlotStatus.available:
         return AppColors.slotAvailable;
       case SlotStatus.occupied:
-        return AppColors.occupied;
+        return AppColors.available;
       case SlotStatus.reserved:
         return AppColors.reserved;
       case SlotStatus.maintenance:
