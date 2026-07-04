@@ -78,6 +78,57 @@ Mục đích:
 
 ## Log History
 
+## [2026-07-04 10:35:03] - Create project README.md
+
+| Field                      | Content                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| AI Tool / Model            | OpenAI Codex / GPT-5                                                                                                            |
+| Support Type               | Documentation / codebase analysis                                                                                               |
+| Estimated AI Support       | 90% AI drafting, 10% developer review                                                                                           |
+| Human Reviewer             | Tran Gia Bao                                                                                                                    |
+| Development Responsibility | AI assisted with implementation, but the developer must review, test, understand, and accept responsibility for the final code. |
+
+### User Prompt
+
+> "Create a professional README.md file for this GitHub project. First, read the entire source code to understand the project, then create a complete README file including: Project Overview, Features, Technologies Used, Architecture, Installation, How to Run, Project Structure, Screenshots (placeholders if none), Demo Links (if any), APIs/Databases (if any), Contributors, Licenses, and anything else necessary. Use clean Markdown with badges and emojis where appropriate. Save the result as a README.md in the project's root directory."
+
+### AI Assistance Summary
+
+- Re-read `AGENTS.md` and inspected the project structure before editing.
+- Reviewed the custom source files in `lib/`, the separate static landing page in `landing/`, project metadata in `pubspec.yaml`, the existing tree documentation, and repository remote information.
+- Replaced the default Flutter README with a project-specific README covering overview, role-based features, architecture, technologies, installation, run instructions, project structure, mock data/backend status, screenshots placeholders, demo links, contributors, and licensing status.
+- Recorded this AI-assisted documentation session in the required usage log.
+
+### Files Created / Modified / Deleted
+
+| File | Action | Summary |
+| --- | --- | --- |
+| `README.md` | Modified | Replaced the default template with a complete GitHub-ready project README tailored to the actual implementation |
+| `docs/AI_USAGE_LOG.md` | Modified | Added the required log entry for this AI-assisted documentation task |
+
+### Commands Run & Results
+
+| Command | Result |
+| --- | --- |
+| `Get-Content -Raw AGENTS.md` | Passed; re-read project instructions before making changes |
+| `rg --files` | Passed; inventoried the repository and identified custom source files |
+| `Get-Content` on `pubspec.yaml`, `lib/`, `landing/`, `tree.md`, `docs/AI_USAGE_LOG.md`, and related files | Passed; reviewed implementation details needed for accurate README content |
+| `git remote -v` | Passed; confirmed repository URL for README demo links |
+| `git status --short --branch --untracked-files=all` | Passed; confirmed local changes before ending the task |
+| `flutter test` | Not run; documentation-only task |
+| `flutter build` | Not run; documentation-only task |
+
+### Git Status Summary
+
+Branch `frontend` is tracking `origin/frontend`. Local changes for this task are limited to `README.md` and `docs/AI_USAGE_LOG.md`. No commit or push was performed.
+
+### Developer Review Notes
+
+- Review the README wording, especially the contributor and license sections, to match how the repository should be presented publicly.
+- Add real screenshots and a live demo URL later if the project is deployed.
+- No application build or test run was needed for this documentation-only change.
+
+---
 ## [2026-06-30 00:35:00] - Simplify manager floor labels and remove legend block
 
 | Field                      | Content                                                                                                                         |
