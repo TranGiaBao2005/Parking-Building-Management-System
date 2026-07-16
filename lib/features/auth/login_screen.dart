@@ -66,6 +66,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() async {
+    if (!_captchaVerified) {
+      setState(() => _error = 'Vui lòng hoàn thành xác minh CAPTCHA.');
+      return;
+    }
+
     final svc = context.read<MockDataService>();
     setState(() {
       _loading = true;
@@ -509,9 +514,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             onSubmitted: (_) => _register(),
           ),
-          const SizedBox(height: 16),
-          _buildCaptcha(),
         ],
+
+        const SizedBox(height: 16),
+        _buildCaptcha(),
 
         if (_error != null) ...[
           const SizedBox(height: 12),

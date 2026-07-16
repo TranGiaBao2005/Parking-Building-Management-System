@@ -20,3 +20,18 @@ Widget buildWebMapView(double lat, double lng) {
   }
   return const HtmlElementView(viewType: viewType);
 }
+
+/// Creates a transparent div to intercept pointers (clicks/hovers) from passing through to iframes.
+Widget buildPointerInterceptor() {
+  const viewType = 'pointer-interceptor-v1';
+  try {
+    ui_web.platformViewRegistry.registerViewFactory(viewType, (int id) {
+      final div = web.HTMLDivElement()
+        ..style.width = '100%'
+        ..style.height = '100%'
+        ..style.backgroundColor = 'transparent';
+      return div;
+    });
+  } catch (_) {}
+  return const HtmlElementView(viewType: viewType);
+}

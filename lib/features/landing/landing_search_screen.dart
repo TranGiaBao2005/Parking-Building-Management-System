@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../core/services/mock_data_service.dart';
 import 'landing_screen.dart';
 
 // ignore: avoid_web_libraries_in_flutter
@@ -94,14 +96,6 @@ class _LandingSearchScreenState extends State<LandingSearchScreen> {
           color: _landingSurface,
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
           child: _SearchBar(controller: _searchCtrl),
-        ),
-        Container(
-          color: _landingSurface,
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-          child: _FilterChips(
-            selected: _filter,
-            onChanged: (f) => setState(() => _filter = f),
-          ),
         ),
         const Divider(height: 1, color: _landingBorder),
         // Map takes remaining space
@@ -227,68 +221,6 @@ class _LeftSearchPanel extends StatelessWidget {
           child: _SearchBar(controller: searchCtrl),
         ),
 
-        // Filter chips
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-          child: _FilterChips(selected: filter, onChanged: onFilterChanged),
-        ),
-
-        // Radius slider
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Khoảng bán kính',
-                  style: TextStyle(color: _landingText, fontSize: 12, fontWeight: FontWeight.w600)),
-              Text('Tất cả',
-                  style: TextStyle(color: _landingAccent, fontSize: 11, fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Slider(
-            value: radius,
-            min: 0,
-            max: 10,
-            divisions: 10,
-            activeColor: _landingAccent,
-            inactiveColor: const Color(0xFFE2E8F0),
-            onChanged: onRadiusChanged,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('0km', style: TextStyle(color: _landingMuted, fontSize: 10)),
-              Text('${radius.toStringAsFixed(0)}km',
-                  style: const TextStyle(color: _landingAccent, fontSize: 10, fontWeight: FontWeight.w600)),
-              const Text('10km', style: TextStyle(color: _landingMuted, fontSize: 10)),
-            ],
-          ),
-        ),
-
-        // Available toggle
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Đặt lịch', style: TextStyle(color: _landingMuted, fontSize: 12)),
-              const Text('Tất cả', style: TextStyle(color: _landingMuted, fontSize: 12)),
-              Switch(
-                value: availableOnly,
-                onChanged: onAvailableChanged,
-                activeThumbColor: _landingAccent,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-            ],
-          ),
-        ),
-
         const Divider(height: 24, color: _landingBorder),
 
         // Results header
@@ -355,7 +287,12 @@ class _SearchBar extends StatelessWidget {
         hintText: 'Tìm kiếm địa điểm với ParkWave',
         hintStyle: const TextStyle(color: _landingMuted, fontSize: 13),
         prefixIcon: const Icon(Icons.search_rounded, color: _landingMuted, size: 18),
-        suffixIcon: const Icon(Icons.my_location_rounded, color: _landingAccent, size: 18),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.my_location_rounded, color: _landingAccent, size: 18),
+          onPressed: () {
+            controller.text = 'Vị trí hiện tại';
+          },
+        ),
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -376,49 +313,7 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-class _FilterChips extends StatelessWidget {
-  final String selected;
-  final void Function(String) onChanged;
-  static const _options = ['Tất cả', 'Sẵn', 'Q.Gần', 'Rate', 'Lợi'];
 
-  const _FilterChips({required this.selected, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: _options.map((opt) {
-          final isSelected = opt == selected;
-          return Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: GestureDetector(
-              onTap: () => onChanged(opt),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isSelected ? _landingAccent : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isSelected ? _landingAccent : _landingBorder,
-                  ),
-                ),
-                child: Text(
-                  opt,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : _landingMuted,
-                    fontSize: 12,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
 
 class _ParkingResultCard extends StatelessWidget {
   final String name;
@@ -450,94 +345,207 @@ class _ParkingResultCard extends StatelessWidget {
             ? const Color(0xFFFBBF24)
             : _landingAccent;
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isHighlighted ? _landingAccentLight : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isHighlighted ? _landingAccent.withValues(alpha: 0.5) : _landingBorder,
-          width: isHighlighted ? 1.5 : 1,
-        ),
-        boxShadow: isHighlighted
-            ? [BoxShadow(color: _landingAccent.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 3))]
-            : null,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    final isLoggedIn = context.watch<MockDataService>().currentUser != null;
+
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => Stack(
+            fit: StackFit.expand,
             children: [
-              Expanded(
-                child: Text(name,
-                    style: TextStyle(
-                      color: _landingText,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      decoration: isHighlighted ? null : null,
-                    )),
-              ),
+              if (kIsWeb) buildPointerInterceptor(),
+              Center(
+                child: AlertDialog(
+                  backgroundColor: _landingSurface,
+            titlePadding: const EdgeInsets.fromLTRB(24, 20, 16, 0),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Colors.black))),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 20, color: _landingMuted),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('📍 Địa chỉ: $address', style: const TextStyle(fontSize: 13, height: 1.5)),
+                const SizedBox(height: 8),
+                Text('🚗 Khoảng cách: $distance', style: const TextStyle(fontSize: 13, height: 1.5)),
+                const SizedBox(height: 8),
+                Text('💰 Giá: $price', style: const TextStyle(fontSize: 13, height: 1.5)),
+                const SizedBox(height: 8),
+                Text('🅿️ Chỗ trống: $available/$total', style: const TextStyle(fontSize: 13, height: 1.5)),
+                Padding(
+                  padding: const EdgeInsets.only(left: 24, top: 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('🚗 Ô tô: ${(available * 0.3).round()} chỗ', style: const TextStyle(fontSize: 12, color: _landingMuted)),
+                      Text('🛵 Xe máy: ${(available * 0.6).round()} chỗ', style: const TextStyle(fontSize: 12, color: _landingMuted)),
+                      Text('🚚 Xe tải: ${(available * 0.1).round()} chỗ', style: const TextStyle(fontSize: 12, color: _landingMuted)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text('⭐ Đánh giá: $rating / 5.0', style: const TextStyle(fontSize: 13, height: 1.5)),
+              ],
+            ),
+            actions: [
               Row(
                 children: [
-                  const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 13),
-                  const SizedBox(width: 2),
-                  Text('$rating', style: const TextStyle(color: _landingText, fontSize: 11, fontWeight: FontWeight.w600)),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _landingAccent,
+                        side: const BorderSide(color: _landingAccent),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text('Dẫn đường', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (!isLoggedIn) {
+                          context.go('/login');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _landingAccent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text('Đặt chỗ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    ),
+                  ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(address, style: const TextStyle(color: _landingMuted, fontSize: 11)),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(Icons.directions_car_outlined, color: _landingMuted, size: 13),
-              const SizedBox(width: 4),
-              Text(distance, style: const TextStyle(color: _landingMuted, fontSize: 11)),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  available == 0 ? 'Hết chỗ' : '$available/$total trống',
-                  style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w700),
-                ),
-              ),
-            ],
+        ), // Close Center
+      ],
+    ), // Close Stack
+  );
+},
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isHighlighted ? _landingAccentLight : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isHighlighted ? _landingAccent.withValues(alpha: 0.5) : _landingBorder,
+            width: isHighlighted ? 1.5 : 1,
           ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: LinearProgressIndicator(
-              value: pct,
-              backgroundColor: const Color(0xFFE2E8F0),
-              valueColor: AlwaysStoppedAnimation<Color>(statusColor),
-              minHeight: 4,
+          boxShadow: isHighlighted
+              ? [BoxShadow(color: _landingAccent.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 3))]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(name,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      )),
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 13),
+                    const SizedBox(width: 2),
+                    Text('$rating', style: const TextStyle(color: _landingText, fontSize: 11, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(price, style: const TextStyle(color: _landingMuted, fontSize: 11)),
-              if (available > 0)
-                GestureDetector(
-                  onTap: () => context.go('/login'),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: _landingAccent,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text('Đặt chỗ', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text(address, style: const TextStyle(color: _landingMuted, fontSize: 11)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(Icons.directions_car_outlined, color: _landingMuted, size: 13),
+                const SizedBox(width: 4),
+                Text(distance, style: const TextStyle(color: _landingMuted, fontSize: 11)),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    available == 0 ? 'Hết chỗ' : '$available/$total trống',
+                    style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w700),
                   ),
                 ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: LinearProgressIndicator(
+                value: pct,
+                backgroundColor: const Color(0xFFE2E8F0),
+                valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                minHeight: 4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(price, style: const TextStyle(color: _landingMuted, fontSize: 11)),
+                if (available > 0)
+                  Row(
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: _landingAccent,
+                          side: const BorderSide(color: _landingAccent),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          minimumSize: const Size(0, 28),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                        child: const Text('Dẫn đường', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (!isLoggedIn) {
+                            context.go('/login');
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _landingAccent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          minimumSize: const Size(0, 28),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                        child: const Text('Đặt chỗ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

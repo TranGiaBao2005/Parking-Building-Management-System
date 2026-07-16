@@ -1,533 +1,445 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import '../../core/services/mock_data_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/utils/responsive.dart';
 
-// Ignore web-only imports on non-web targets
 // ignore: avoid_web_libraries_in_flutter
 import 'map_screen_web.dart' if (dart.library.io) 'map_screen_stub.dart';
 
-// Tọa độ bãi xe: 123 Nguyễn Văn Linh, Q.7, TP.HCM
 const _lat = 10.7285;
 const _lng = 106.7127;
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
   @override
+  State<MapScreen> createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  final _searchCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final svc = context.watch<MockDataService>();
     final isMobile = Responsive.isMobile(context);
-    final padding = isMobile ? 16.0 : 28.0;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(padding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Header
-            _buildHeader(context),
-            const SizedBox(height: 20),
-
-            // ── Distance banner
-            _DistanceBanner(address: svc.buildingAddress),
-            const SizedBox(height: 16),
-
-            // ── Map widget (iframe on web, styled card on other)
-            _MapCard(isMobile: isMobile),
-            const SizedBox(height: 24),
-
-            // ── Floor legend
-            Text('Chỗ trống theo tầng',
-                    style: Theme.of(context).textTheme.titleLarge)
-                .animate()
-                .fadeIn(delay: 200.ms),
-            const SizedBox(height: 12),
-
-            _FloorLegend(svc: svc),
-            const SizedBox(height: 24),
-
-            // ── CTA
-            _BookingCta(),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+      body: isMobile ? _buildMobile() : _buildDesktop(),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildDesktop() {
     return Row(
+      children: [
+        // ── Left Panel
+        Container(
+          width: 320,
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            border: Border(right: BorderSide(color: AppColors.border)),
+          ),
+          child: _LeftSearchPanel(
+            searchCtrl: _searchCtrl,
+          ),
+        ),
+        // ── Right: Map
+        Expanded(child: _buildMapArea()),
+      ],
+    );
+  }
+
+  Widget _buildMobile() {
+    return Column(
       children: [
         Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: AppColors.accent.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(Icons.map_rounded,
-              color: AppColors.accent, size: 22),
+          color: AppColors.surface,
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+          child: _SearchBar(controller: _searchCtrl),
         ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Bản đồ bãi xe',
-                style: Theme.of(context).textTheme.titleLarge),
-            const Text('Vị trí & tình trạng chỗ trống',
-                style: TextStyle(
-                    color: AppColors.textSecondary, fontSize: 12)),
-          ],
-        ),
+        const Divider(height: 1, color: AppColors.border),
+        Expanded(child: _buildMapArea()),
       ],
-    ).animate().fadeIn().slideY(begin: -0.15);
+    );
   }
-}
 
-// ──────────────────────────────────────────────
-// Distance + time banner
-// ──────────────────────────────────────────────
-class _DistanceBanner extends StatelessWidget {
-  final String address;
-  const _DistanceBanner({required this.address});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [
-            AppColors.accent.withOpacity(0.12),
-            AppColors.primary.withOpacity(0.08),
-          ],
+  Widget _buildMapArea() {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: kIsWeb
+              ? buildWebMapView(_lat, _lng)
+              : Container(
+                  color: const Color(0xFFE8F4FD),
+                  child: const Center(
+                    child: Text('Bản đồ chỉ hiển thị trên Web',
+                        style: TextStyle(color: AppColors.textSecondary)),
+                  ),
+                ),
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.accent.withOpacity(0.30)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
+        Positioned(
+          top: 12,
+          right: 12,
+          child: Container(
             decoration: BoxDecoration(
-              color: AppColors.accent.withOpacity(0.15),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.near_me_rounded,
-                color: AppColors.accent, size: 20),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  address,
-                  style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    _InfoChip(
-                        icon: Icons.directions_car_outlined,
-                        label: '~1.8 km',
-                        color: AppColors.accent),
-                    const SizedBox(width: 12),
-                    _InfoChip(
-                        icon: Icons.access_time_rounded,
-                        label: '~8 phút lái xe',
-                        color: AppColors.available),
-                    const SizedBox(width: 12),
-                    _InfoChip(
-                        icon: Icons.directions_walk_rounded,
-                        label: '~22 phút đi bộ',
-                        color: AppColors.textSecondary),
-                  ],
-                ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: const [
+                BoxShadow(color: Color(0x22000000), blurRadius: 6, offset: Offset(0, 2))
               ],
             ),
+            child: IconButton(
+              icon: const Icon(Icons.my_location_rounded, color: AppColors.accent, size: 20),
+              tooltip: 'Vị trí của tôi',
+              onPressed: () {},
+            ),
           ),
-        ],
-      ),
-    ).animate().fadeIn(delay: 80.ms).slideY(begin: -0.1);
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _InfoChip(
-      {required this.icon, required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 13),
-        const SizedBox(width: 4),
-        Text(label,
-            style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w600)),
+        ),
       ],
     );
   }
 }
 
 // ──────────────────────────────────────────────
-// Map card — iframe on web, custom drawn on others
+// Left search panel
 // ──────────────────────────────────────────────
-class _MapCard extends StatelessWidget {
-  final bool isMobile;
-  const _MapCard({required this.isMobile});
+class _LeftSearchPanel extends StatelessWidget {
+  final TextEditingController searchCtrl;
 
-  @override
-  Widget build(BuildContext context) {
-    final mapHeight = isMobile ? 260.0 : 400.0;
-
-    return Container(
-      height: mapHeight,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-        color: AppColors.surface,
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          // Map content: iframe on web, fake map on other platforms
-          kIsWeb
-              ? buildWebMapView(_lat, _lng)
-              : _FakeMapCanvas(isMobile: isMobile),
-
-          // Overlay badge – bãi xe pin
-          Positioned(
-            top: 12,
-            right: 12,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.bg.withOpacity(0.90),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.local_parking_rounded,
-                      color: AppColors.primary, size: 15),
-                  SizedBox(width: 6),
-                  Text('Bãi xe SWP08',
-                      style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600)),
-                ],
-              ),
-            ),
-          ),
-
-          // Open in Maps button (bottom left)
-          Positioned(
-            bottom: 12,
-            left: 12,
-            child: _OpenMapsButton(),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(delay: 140.ms);
-  }
-}
-
-// Nút mở Google Maps
-class _OpenMapsButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Trong prototype chỉ show snackbar, không mở link thật
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Mở Google Maps bằng ứng dụng bản đồ của bạn'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.4),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.open_in_new_rounded, color: Colors.white, size: 13),
-            SizedBox(width: 6),
-            Text('Mở Maps',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Fake map canvas cho non-web hoặc khi iframe chưa load
-class _FakeMapCanvas extends StatelessWidget {
-  final bool isMobile;
-  const _FakeMapCanvas({required this.isMobile});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _MapGridPainter(),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.local_parking_rounded,
-                  color: Colors.white, size: 26),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.bg.withOpacity(0.85),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'Bãi Xe Thông Minh SWP08',
-                style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final gridPaint = Paint()
-      ..color = const Color(0xFF1E293B)
-      ..strokeWidth = 1;
-
-    // Background
-    canvas.drawRect(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        Paint()..color = const Color(0xFF0F1A2E));
-
-    // Grid lines (ô vuông giả bản đồ)
-    const step = 40.0;
-    for (double x = 0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
-    }
-    for (double y = 0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    // Fake roads
-    final roadPaint = Paint()
-      ..color = const Color(0xFF1E3A5F)
-      ..strokeWidth = 16;
-
-    final mainRoad = size.height * 0.55;
-    canvas.drawLine(
-        Offset(0, mainRoad), Offset(size.width, mainRoad), roadPaint);
-
-    final sideRoad = size.width * 0.45;
-    canvas.drawLine(
-        Offset(sideRoad, 0), Offset(sideRoad, size.height), roadPaint);
-
-    // Fake buildings (rectangles)
-    final buildingPaint = Paint()..color = const Color(0xFF1E293B);
-    final rects = [
-      Rect.fromLTWH(size.width * 0.05, size.height * 0.08, 80, 50),
-      Rect.fromLTWH(size.width * 0.60, size.height * 0.08, 100, 60),
-      Rect.fromLTWH(size.width * 0.05, size.height * 0.68, 60, 70),
-      Rect.fromLTWH(size.width * 0.60, size.height * 0.68, 90, 55),
-    ];
-    for (final r in rects) {
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(r, const Radius.circular(4)),
-        buildingPaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_) => false;
-}
-
-// ──────────────────────────────────────────────
-// Floor availability legend
-// ──────────────────────────────────────────────
-class _FloorLegend extends StatelessWidget {
-  final MockDataService svc;
-  const _FloorLegend({required this.svc});
+  const _LeftSearchPanel({
+    required this.searchCtrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: svc.floors.asMap().entries.map((e) {
-        final floor = e.value;
-        final total = svc.slotsForFloor(floor.id).length;
-        final avail = svc.availableCount(floor.id);
-        final pct = total > 0 ? avail / total : 0.0;
-        final color = avail == 0
-            ? AppColors.occupied
-            : pct < 0.2
-                ? AppColors.reserved
-                : AppColors.available;
-
-        return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.25)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    '${floor.floorNumber}',
-                    style: TextStyle(
-                        color: color,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+          child: _SearchBar(controller: searchCtrl),
+        ),
+        const Divider(height: 24, color: AppColors.border),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: Text('KẾT QUẢ',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            children: const [
+              _ParkingResultCard(
+                name: 'Bãi Xe SWP08 – Q.7',
+                address: '123 Nguyễn Văn Linh, Q.7',
+                distance: '2.5 km',
+                available: 86,
+                total: 145,
+                price: '5k–15k/giờ',
+                rating: 4.7,
+                isHighlighted: true,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(floor.name,
-                        style: const TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 5),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: pct,
-                        backgroundColor: AppColors.surfaceLight,
-                        valueColor: AlwaysStoppedAnimation<Color>(color),
-                        minHeight: 5,
-                      ),
-                    ),
-                  ],
-                ),
+              SizedBox(height: 10),
+              _ParkingResultCard(
+                name: 'Bãi Xe Hầm Crescent Mall',
+                address: '101 Tôn Dật Tiên, Q.7',
+                distance: '3.1 km',
+                available: 24,
+                total: 80,
+                price: '10k–20k/giờ',
+                rating: 4.3,
               ),
-              const SizedBox(width: 14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    avail == 0 ? 'Hết chỗ' : '$avail trống',
-                    style: TextStyle(
-                        color: color,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Text('$total slot',
-                      style: const TextStyle(
-                          color: AppColors.textMuted, fontSize: 11)),
-                ],
+              SizedBox(height: 10),
+              _ParkingResultCard(
+                name: 'Bãi Xe Gigamall',
+                address: 'Phạm Văn Đồng, Thủ Đức',
+                distance: '4.8 km',
+                available: 0,
+                total: 60,
+                price: '5k–12k/giờ',
+                rating: 4.1,
               ),
             ],
           ),
-        ).animate().fadeIn(
-            delay: Duration(milliseconds: 240 + e.key * 60));
-      }).toList(),
+        ),
+      ],
     );
   }
 }
 
-// ──────────────────────────────────────────────
-// Book now CTA
-// ──────────────────────────────────────────────
-class _BookingCta extends StatelessWidget {
+class _SearchBar extends StatelessWidget {
+  final TextEditingController controller;
+  const _SearchBar({required this.controller});
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () => context.go('/driver/booking'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14)),
+    return TextField(
+      controller: controller,
+      style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+      decoration: InputDecoration(
+        hintText: 'Tìm kiếm địa điểm với ParkWave',
+        hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 18),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.my_location_rounded, color: AppColors.accent, size: 18),
+          onPressed: () {
+            controller.text = 'Vị trí hiện tại';
+          },
         ),
-        icon: const Icon(Icons.bookmark_add_rounded, size: 20),
-        label: const Text('Đặt chỗ ngay',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+        ),
       ),
-    ).animate().fadeIn(delay: 450.ms).slideY(begin: 0.2);
+    );
+  }
+}
+
+class _ParkingResultCard extends StatelessWidget {
+  final String name;
+  final String address;
+  final String distance;
+  final int available;
+  final int total;
+  final String price;
+  final double rating;
+  final bool isHighlighted;
+
+  const _ParkingResultCard({
+    required this.name,
+    required this.address,
+    required this.distance,
+    required this.available,
+    required this.total,
+    required this.price,
+    required this.rating,
+    this.isHighlighted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = total > 0 ? available / total : 0.0;
+    final statusColor = available == 0
+        ? const Color(0xFFEF4444)
+        : pct < 0.3
+            ? const Color(0xFFFBBF24)
+            : AppColors.accent;
+
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => Stack(
+            fit: StackFit.expand,
+            children: [
+              if (kIsWeb) buildPointerInterceptor(),
+              Center(
+                child: AlertDialog(
+                  backgroundColor: AppColors.surface,
+                  titlePadding: const EdgeInsets.fromLTRB(24, 20, 16, 0),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Colors.black))),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20, color: AppColors.textSecondary),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('📍 Địa chỉ: $address', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      const SizedBox(height: 8),
+                      Text('🚗 Khoảng cách: $distance', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      const SizedBox(height: 8),
+                      Text('💰 Giá: $price', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      const SizedBox(height: 8),
+                      Text('🅿️ Chỗ trống: $available/$total', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 24, top: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('🚗 Ô tô: ${(available * 0.3).round()} chỗ', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                            Text('🛵 Xe máy: ${(available * 0.6).round()} chỗ', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                            Text('🚚 Xe tải: ${(available * 0.1).round()} chỗ', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text('⭐ Đánh giá: $rating / 5.0', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                    ],
+                  ),
+                  actions: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.accent,
+                              side: const BorderSide(color: AppColors.accent),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text('Dẫn đường', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              context.push('/driver/booking');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.accent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text('Đặt chỗ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ), // Close Center
+            ],
+          ), // Close Stack
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isHighlighted ? AppColors.accent.withOpacity(0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isHighlighted ? AppColors.accent.withOpacity(0.5) : AppColors.border,
+            width: isHighlighted ? 1.5 : 1,
+          ),
+          boxShadow: isHighlighted
+              ? [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 3))]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(name,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      )),
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 13),
+                    const SizedBox(width: 2),
+                    Text('$rating', style: const TextStyle(color: AppColors.textPrimary, fontSize: 11, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(address, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(Icons.directions_car_outlined, color: AppColors.textSecondary, size: 13),
+                const SizedBox(width: 4),
+                Text(distance, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    available == 0 ? 'Hết chỗ' : '$available/$total trống',
+                    style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: LinearProgressIndicator(
+                value: pct,
+                backgroundColor: const Color(0xFFE2E8F0),
+                valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                minHeight: 4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(price, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                if (available > 0)
+                  Row(
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.accent,
+                          side: const BorderSide(color: AppColors.accent),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          minimumSize: const Size(0, 28),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                        child: const Text('Dẫn đường', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.push('/driver/booking');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          minimumSize: const Size(0, 28),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                        child: const Text('Đặt chỗ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

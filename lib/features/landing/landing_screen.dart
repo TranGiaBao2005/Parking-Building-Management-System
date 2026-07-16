@@ -37,94 +37,107 @@ class LandingNavbar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              GestureDetector(
-                onTap: () => context.go('/'),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ParkingBrandLogo(size: 40),
-                    SizedBox(width: 11),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () => context.go('/'),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'ParkSmart',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800),
-                        ),
-                        Text(
-                          'SWP08',
-                          style: TextStyle(
-                              color: Color(0xFF70E5F5),
-                              fontSize: 8,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 2.2),
+                        ParkingBrandLogo(size: 40),
+                        SizedBox(width: 11),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'ParkSmart',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800),
+                            ),
+                            Text(
+                              'SWP08',
+                              style: TextStyle(
+                                  color: Color(0xFF70E5F5),
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 2.2),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-              const Spacer(),
-              if (!compact) ...[
-                _NavTabButton(
-                  label: 'Trang chủ',
-                  icon: Icons.home_outlined,
-                  active: activePage == 'home',
-                  onTap: () => context.go('/'),
-                ),
-                _NavTabButton(
-                  label: 'Tìm kiếm',
-                  icon: Icons.map_outlined,
-                  active: activePage == 'search',
-                  onTap: () => context.go('/search'),
-                ),
-                _NavTabButton(
-                  label: 'Chatbot',
-                  icon: Icons.smart_toy_outlined,
-                  active: activePage == 'chat',
-                  onTap: () => context.go('/chat'),
-                ),
-                const SizedBox(width: 16),
-              ] else ...[
-                // Mobile: icon buttons
-                IconButton(
-                  icon: Icon(
-                    Icons.home_rounded,
-                    color: activePage == 'home' ? _landingCyan : _landingMuted,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!compact) ...[
+                    _NavTabButton(
+                      label: 'Trang chủ',
+                      icon: Icons.home_outlined,
+                      active: activePage == 'home',
+                      onTap: () => context.go('/'),
+                    ),
+                    _NavTabButton(
+                      label: 'Tìm kiếm',
+                      icon: Icons.map_outlined,
+                      active: activePage == 'search',
+                      onTap: () => context.go('/search'),
+                    ),
+                    _NavTabButton(
+                      label: 'Chatbot',
+                      icon: Icons.smart_toy_outlined,
+                      active: activePage == 'chat',
+                      onTap: () => context.go('/chat'),
+                    ),
+                  ] else ...[
+                    // Mobile: icon buttons
+                    IconButton(
+                      icon: Icon(
+                        Icons.home_rounded,
+                        color: activePage == 'home' ? _landingCyan : _landingMuted,
+                      ),
+                      onPressed: () => context.go('/'),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.map_rounded,
+                        color: activePage == 'search' ? _landingCyan : _landingMuted,
+                      ),
+                      onPressed: () => context.go('/search'),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.smart_toy_rounded,
+                        color: activePage == 'chat' ? _landingCyan : _landingMuted,
+                      ),
+                      onPressed: () => context.go('/chat'),
+                    ),
+                  ],
+                ],
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton.icon(
+                    onPressed: onLogin,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _landingPurple,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: compact ? 13 : 18, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(11)),
+                    ),
+                    icon: const Icon(Icons.login_rounded, size: 16),
+                    label: Text(compact ? 'Đăng nhập' : 'Bắt đầu gửi xe'),
                   ),
-                  onPressed: () => context.go('/'),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.map_rounded,
-                    color: activePage == 'search' ? _landingCyan : _landingMuted,
-                  ),
-                  onPressed: () => context.go('/search'),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.smart_toy_rounded,
-                    color: activePage == 'chat' ? _landingCyan : _landingMuted,
-                  ),
-                  onPressed: () => context.go('/chat'),
-                ),
-              ],
-              ElevatedButton.icon(
-                onPressed: onLogin,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _landingPurple,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: compact ? 13 : 18, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11)),
-                ),
-                icon: const Icon(Icons.login_rounded, size: 16),
-                label: Text(compact ? 'Đăng nhập' : 'Bắt đầu gửi xe'),
               ),
             ],
           ),
