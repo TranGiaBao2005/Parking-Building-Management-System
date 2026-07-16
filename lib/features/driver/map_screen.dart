@@ -65,7 +65,17 @@ class _MapScreenState extends State<MapScreen> {
           child: _SearchBar(controller: _searchCtrl),
         ),
         const Divider(height: 1, color: AppColors.border),
-        Expanded(child: _buildMapArea()),
+        Expanded(flex: 2, child: _buildMapArea()),
+        Expanded(
+          flex: 3,
+          child: Container(
+            color: AppColors.surface,
+            child: _LeftSearchPanel(
+              searchCtrl: _searchCtrl,
+              showSearchBar: false,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -74,15 +84,7 @@ class _MapScreenState extends State<MapScreen> {
     return Stack(
       children: [
         Positioned.fill(
-          child: kIsWeb
-              ? buildWebMapView(_lat, _lng)
-              : Container(
-                  color: const Color(0xFFE8F4FD),
-                  child: const Center(
-                    child: Text('Bản đồ chỉ hiển thị trên Web',
-                        style: TextStyle(color: AppColors.textSecondary)),
-                  ),
-                ),
+          child: buildWebMapView(_lat, _lng),
         ),
         Positioned(
           top: 12,
@@ -112,9 +114,11 @@ class _MapScreenState extends State<MapScreen> {
 // ──────────────────────────────────────────────
 class _LeftSearchPanel extends StatelessWidget {
   final TextEditingController searchCtrl;
+  final bool showSearchBar;
 
   const _LeftSearchPanel({
     required this.searchCtrl,
+    this.showSearchBar = true,
   });
 
   @override
@@ -122,11 +126,13 @@ class _LeftSearchPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-          child: _SearchBar(controller: searchCtrl),
-        ),
-        const Divider(height: 24, color: AppColors.border),
+        if (showSearchBar) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+            child: _SearchBar(controller: searchCtrl),
+          ),
+          const Divider(height: 24, color: AppColors.border),
+        ],
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text('KẾT QUẢ',
@@ -259,7 +265,7 @@ class _ParkingResultCard extends StatelessWidget {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Colors.black))),
+                      Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.textPrimary))),
                       IconButton(
                         icon: const Icon(Icons.close, size: 20, color: AppColors.textSecondary),
                         onPressed: () => Navigator.pop(context),
@@ -270,13 +276,13 @@ class _ParkingResultCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('📍 Địa chỉ: $address', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      Text('📍 Địa chỉ: $address', style: const TextStyle(fontSize: 13, height: 1.5, color: AppColors.textPrimary)),
                       const SizedBox(height: 8),
-                      Text('🚗 Khoảng cách: $distance', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      Text('🚗 Khoảng cách: $distance', style: const TextStyle(fontSize: 13, height: 1.5, color: AppColors.textPrimary)),
                       const SizedBox(height: 8),
-                      Text('💰 Giá: $price', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      Text('💰 Giá: $price', style: const TextStyle(fontSize: 13, height: 1.5, color: AppColors.textPrimary)),
                       const SizedBox(height: 8),
-                      Text('🅿️ Chỗ trống: $available/$total', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      Text('🅿️ Chỗ trống: $available/$total', style: const TextStyle(fontSize: 13, height: 1.5, color: AppColors.textPrimary)),
                       Padding(
                         padding: const EdgeInsets.only(left: 24, top: 4),
                         child: Column(
@@ -289,7 +295,7 @@ class _ParkingResultCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text('⭐ Đánh giá: $rating / 5.0', style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.black)),
+                      Text('⭐ Đánh giá: $rating / 5.0', style: const TextStyle(fontSize: 13, height: 1.5, color: AppColors.textPrimary)),
                     ],
                   ),
                   actions: [

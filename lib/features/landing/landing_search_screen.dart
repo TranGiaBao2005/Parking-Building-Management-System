@@ -98,8 +98,24 @@ class _LandingSearchScreenState extends State<LandingSearchScreen> {
           child: _SearchBar(controller: _searchCtrl),
         ),
         const Divider(height: 1, color: _landingBorder),
-        // Map takes remaining space
-        Expanded(child: _buildMapArea()),
+        // Map and List
+        Expanded(flex: 2, child: _buildMapArea()),
+        Expanded(
+          flex: 3,
+          child: Container(
+            color: _landingSurface,
+            child: _LeftSearchPanel(
+              searchCtrl: _searchCtrl,
+              filter: _filter,
+              radius: _radius,
+              availableOnly: _availableOnly,
+              onFilterChanged: (f) => setState(() => _filter = f),
+              onRadiusChanged: (r) => setState(() => _radius = r),
+              onAvailableChanged: (v) => setState(() => _availableOnly = v),
+              showSearchBar: false,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -109,15 +125,7 @@ class _LandingSearchScreenState extends State<LandingSearchScreen> {
       children: [
         // Map
         Positioned.fill(
-          child: kIsWeb
-              ? buildWebMapView(_lat, _lng)
-              : Container(
-                  color: const Color(0xFFE8F4FD),
-                  child: const Center(
-                    child: Text('Bản đồ chỉ hiển thị trên Web',
-                        style: TextStyle(color: _landingMuted)),
-                  ),
-                ),
+          child: buildWebMapView(_lat, _lng),
         ),
 
         // Top-right: my location button
@@ -196,6 +204,7 @@ class _LeftSearchPanel extends StatelessWidget {
   final String filter;
   final double radius;
   final bool availableOnly;
+  final bool showSearchBar;
   final void Function(String) onFilterChanged;
   final void Function(double) onRadiusChanged;
   final void Function(bool) onAvailableChanged;
@@ -208,6 +217,7 @@ class _LeftSearchPanel extends StatelessWidget {
     required this.onFilterChanged,
     required this.onRadiusChanged,
     required this.onAvailableChanged,
+    this.showSearchBar = true,
   });
 
   @override
@@ -215,13 +225,14 @@ class _LeftSearchPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Search
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-          child: _SearchBar(controller: searchCtrl),
-        ),
-
-        const Divider(height: 24, color: _landingBorder),
+        if (showSearchBar) ...[
+          // Search
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+            child: _SearchBar(controller: searchCtrl),
+          ),
+          const Divider(height: 24, color: _landingBorder),
+        ],
 
         // Results header
         const Padding(
