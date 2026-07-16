@@ -38,6 +38,18 @@ class DriverShell extends StatelessWidget {
           activeIcon: Icons.feedback,
           path: '/driver/feedback',
         ),
+        NavItem(
+          label: 'Bản đồ',
+          icon: Icons.map_outlined,
+          activeIcon: Icons.map,
+          path: '/driver/map',
+        ),
+        NavItem(
+          label: 'Chatbot',
+          icon: Icons.smart_toy_outlined,
+          activeIcon: Icons.smart_toy,
+          path: '/driver/chat',
+        ),
       ],
     );
   }

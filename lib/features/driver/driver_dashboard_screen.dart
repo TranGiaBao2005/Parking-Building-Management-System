@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
@@ -64,6 +65,39 @@ class DriverDashboardScreen extends StatelessWidget {
                 ],
               ),
             ).animate().fadeIn().slideY(begin: -0.2),
+            const SizedBox(height: 16),
+
+            // Quick Actions — 3 nút
+            Row(
+              children: [
+                Expanded(
+                  child: _QuickActionButton(
+                    icon: Icons.home_rounded,
+                    label: 'Trang chủ',
+                    color: const Color(0xFF7C3AED),
+                    onTap: () => context.go('/'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _QuickActionButton(
+                    icon: Icons.search_rounded,
+                    label: 'Tìm kiếm',
+                    color: AppColors.accent,
+                    onTap: () => context.go('/driver/map'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _QuickActionButton(
+                    icon: Icons.smart_toy_rounded,
+                    label: 'Chatbot',
+                    color: AppColors.available,
+                    onTap: () => context.go('/driver/chat'),
+                  ),
+                ),
+              ],
+            ).animate().fadeIn(delay: 120.ms).slideY(begin: 0.1),
             const SizedBox(height: 28),
 
             // Slot availability per floor
@@ -253,6 +287,50 @@ class _PriceItem extends StatelessWidget {
           Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
           Text(value, style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w500)),
         ],
+      ),
+    );
+  }
+}
+
+class _QuickActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withOpacity(0.35)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

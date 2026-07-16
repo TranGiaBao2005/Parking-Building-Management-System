@@ -2586,3 +2586,131 @@ Chưa khởi tạo kho lưu trữ git (fatal: not a git repository).
 
 
 
+
+---
+
+## Log #1
+
+**Date/Time:** 2026-07-14 08:28 – 08:43 ICT
+
+**AI Tool/Model:** Antigravity (Claude Sonnet 4.6 Thinking)
+
+**User Request/Prompt:** Áp dụng điểm cải thiện UI: thêm Quick Action buttons và Map View vào Driver Dashboard
+
+**Task Name:** Driver UI Improvements + Map View
+
+**AI Assistance Summary:**
+- Tạo màn hình Map View mới (map_screen.dart) cho Driver role
+- Tạo conditional import files (map_screen_web.dart dùng package:web + dart:ui_web để embed Google Maps iframe, map_screen_stub.dart cho non-web)
+- Thêm 2 Quick Action buttons ("Đặt chỗ ngay" + "Xem bản đồ") vào Driver Dashboard ngay dưới welcome header
+- Thêm tab "Bản đồ" vào Driver navigation shell
+- Thêm route /driver/map vào app_router.dart
+- Thêm dependency package:web 1.1.1 vào pubspec.yaml
+
+**Estimated AI Support Level:** 95% (AI viết toàn bộ code, developer review và approve)
+
+**Files Created:**
+- lib/features/driver/map_screen.dart (mới)
+- lib/features/driver/map_screen_web.dart (mới)
+- lib/features/driver/map_screen_stub.dart (mới)
+
+**Files Modified:**
+- lib/features/driver/driver_dashboard_screen.dart
+- lib/features/driver/driver_shell.dart
+- lib/core/router/app_router.dart
+- pubspec.yaml, pubspec.lock
+
+**Commands Run:**
+- lutter pub add web
+- dart analyze lib/features/driver/...
+
+**Test/Build Result:** dart analyze - chỉ info warnings (withOpacity deprecated, prefer_const), không có errors.
+
+**Git Status Summary:**
+- Branch: frontend
+- Modified: app_router.dart, driver_dashboard_screen.dart, driver_shell.dart, pubspec.yaml, pubspec.lock
+- Untracked (new): map_screen.dart, map_screen_web.dart, map_screen_stub.dart
+
+**Human Developer Review Note:** Cần developer kiểm tra UI trực tiếp trên Chrome (flutter run -d chrome), confirm iframe Google Maps hiển thị đúng tại /driver/map, và test 2 nút Quick Action điều hướng đúng trước khi commit.
+
+
+---
+
+## Log #2
+
+**Date/Time:** 2026-07-14 08:54 – 09:00 ICT
+
+**AI Tool/Model:** Antigravity (Claude Sonnet 4.6 Thinking)
+
+**User Request/Prompt:** Đổi Quick Action thành 3 nút: Trang chủ (landing), Tìm kiếm (map), Chatbot (GPT Q&A)
+
+**Task Name:** Driver Quick Actions — 3 Buttons + Chatbot Screen
+
+**AI Assistance Summary:**
+- Đổi 2 nút Quick Action thành 3 nút mới: Trang chủ (/), Tìm kiếm (/driver/map), Chatbot (/driver/chat)
+- Tạo ChatbotScreen mới với UI kiểu GPT: chat bubbles, typing indicator animation, quick suggestion chips, input bar
+- Mock bot engine (keyword matching) hỗ trợ Q&A về giá xe, chỗ trống, đặt chỗ, địa chỉ, giờ mở cửa, phản hồi
+- Thêm route /driver/chat vào app_router.dart
+- Thêm tab Chatbot vào driver_shell.dart
+
+**Estimated AI Support Level:** 95%
+
+**Files Created:**
+- lib/features/driver/chatbot_screen.dart
+
+**Files Modified:**
+- lib/features/driver/driver_dashboard_screen.dart
+- lib/features/driver/driver_shell.dart
+- lib/core/router/app_router.dart
+
+**Git Status Summary:**
+- Branch: frontend
+- New untracked: chatbot_screen.dart
+- Modified: driver_dashboard_screen.dart, driver_shell.dart, app_router.dart
+
+**Human Developer Review Note:** Cần test chatbot bằng cách nhập các câu hỏi mẫu (giá xe, còn chỗ không...) và xác nhận typing indicator hoạt động. Review mock responses xem có phù hợp nội dung bãi xe thật không.
+
+## [2026-07-15 16:20] C?i thi?n giao di?n Landing Page (Prototype)
+- **AI Model**: Gemini 3.1 Pro (High)
+- **Task**: Ch?nh s?a m�n h�nh landing_screen.dart th�nh giao di?n c� 3 ch?c nang ch�nh: Trang ch?, T�m ki?m kho?ng c�ch (Map), v� Chatbot AI.
+- **Summary**:
+  - G? b? c�c section tinh cu (L?i �ch, FAQ, etc.).
+  - X�y d?ng layout Navbar m?i g?m Trang ch?, T�m ki?m, Chatbot.
+  - Th�m mockup component _LandingMapSection gi? l?p b?n d? v� hi?n th? kho?ng c�ch 2.5km, th?i gian l�i xe.
+  - Th�m mockup component _LandingChatbotSection gi? l?p khung chat AI tr?c ti?p tr�n giao di?n d? h?i d�p v? b�i d?.
+- **Support Level**: AI implementation and UI refactoring
+- **Files Modified**: 
+  - lib/features/landing/landing_screen.dart
+- **Verification**: �� ch?y flutter analyze.
+- **Review Note**: S?n s�ng d? build v� review giao di?n prototype tr�n Simulator/Web.
+
+## [2026-07-15 18:28] Tach 3 trang rieng biet cho Landing Page
+- **AI Model**: Claude Sonnet 4.6 (Thinking)
+- **Task**: Tach thanh dieu huong Landing Page thanh 3 page rieng: Trang chu (/), Tim kiem (/search), Chatbot (/chat)
+- **Summary**:
+  - Chinh sua LandingScreen: Navbar dung context.go() thay vi scrollTo
+  - Xuat LandingNavbar thanh public widget (tai su dung o ca 3 trang)
+  - Tao moi: landing_search_screen.dart (ban do, khoang cach, slot theo tang)
+  - Tao moi: landing_chat_screen.dart (chatbot AI keyword-matching, split layout)
+  - Cap nhat app_router.dart: them /search va /chat la route public (khong can dang nhap)
+- **Files Modified**: 
+  - lib/features/landing/landing_screen.dart
+  - lib/core/router/app_router.dart
+- **Files Created**:
+  - lib/features/landing/landing_search_screen.dart
+  - lib/features/landing/landing_chat_screen.dart
+- **Verification**: flutter analyze (no errors)
+- **Review Note**: Can test browse / -> /search -> /chat tren browser va kiem tra Hot Reload.
+
+## [2026-07-15 19:25] Update Landing Search & Chat Pages to match real layout
+- **AI Model**: Gemini 3.1 Pro (High)
+- **Task**: Xay dung trang /search va /chat cua landing giong bo cuc that tren app cho user chua login.
+- **Summary**:
+  - Sua lai trang landing_search_screen.dart (panel search/filter ben trai, map frame ben phai, banner login).
+  - Sua lai trang landing_chat_screen.dart (sidebar lich su, chatbot section giong y het app, them login banner).
+  - Fix cac loi lint nhu unused variables, const constructors.
+- **Files Modified**: 
+  - lib/features/landing/landing_search_screen.dart
+  - lib/features/landing/landing_chat_screen.dart
+- **Verification**: flutter analyze (no errors)
+- **Review Note**: Nguoi dung co the kiem tra lai trang search va chat de thay layout split giong trong app.

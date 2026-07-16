@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../core/services/mock_data_service.dart';
 import '../../core/models/models.dart';
 import '../../features/landing/landing_screen.dart';
+import '../../features/landing/landing_search_screen.dart';
+import '../../features/landing/landing_chat_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/manager/manager_shell.dart';
 import '../../features/manager/dashboard_screen.dart';
@@ -20,6 +22,8 @@ import '../../features/driver/driver_dashboard_screen.dart';
 import '../../features/driver/my_sessions_screen.dart';
 import '../../features/driver/prebooking_screen.dart';
 import '../../features/driver/feedback_screen.dart';
+import '../../features/driver/map_screen.dart';
+import '../../features/driver/chatbot_screen.dart';
 import '../../features/admin/admin_shell.dart';
 import '../../features/admin/system_config_screen.dart';
 import '../../features/admin/user_management_screen.dart';
@@ -33,9 +37,12 @@ final appRouter = GoRouter(
     final isGoingToLogin = loc == '/login';
     final isGoingToLanding = loc == '/';
 
+    final isPublicRoute = loc == '/search' || loc == '/chat';
+
     if (!loggedIn) {
       if (kIsWeb && isGoingToLanding) return null;
       if (isGoingToLogin) return null;
+      if (isPublicRoute) return null;
       return kIsWeb ? '/' : '/login';
     }
 
@@ -62,6 +69,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) => const LandingSearchScreen(),
+    ),
+    GoRoute(
+      path: '/chat',
+      builder: (context, state) => const LandingChatScreen(),
     ),
 
     // Manager
@@ -129,6 +144,14 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/driver/feedback',
           builder: (context, state) => const FeedbackScreen(),
+        ),
+        GoRoute(
+          path: '/driver/map',
+          builder: (context, state) => const MapScreen(),
+        ),
+        GoRoute(
+          path: '/driver/chat',
+          builder: (context, state) => const ChatbotScreen(),
         ),
       ],
     ),
